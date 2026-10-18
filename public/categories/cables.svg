@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="cableBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F4F8FA"/>
+      <stop offset="100%" stop-color="#E5EFF5"/>
+    </linearGradient>
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ECEFF1"/>
+      <stop offset="100%" stop-color="#B0BEC5"/>
+    </linearGradient>
+    <filter id="cableShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#FF6B00" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="120" height="120" rx="30" fill="url(#cableBg)"/>
+  <!-- Coiled Braided Wire -->
+  <path d="M30 85 C20 60 40 40 60 55 C80 70 100 50 90 25" fill="none" stroke="#FF6B00" stroke-width="7" stroke-linecap="round" stroke-dasharray="1 1"/>
+  <path d="M30 85 C20 60 40 40 60 55 C80 70 100 50 90 25" fill="none" stroke="#E55A00" stroke-width="6" stroke-linecap="round"/>
+  <!-- Type-C Connector Head (Left) -->
+  <g transform="translate(25, 75) rotate(-30)" filter="url(#cableShadow)">
+    <rect x="-8" y="-12" width="16" height="24" rx="4" fill="#263238"/>
+    <rect x="-5" y="-18" width="10" height="7" rx="2" fill="url(#metalGrad)"/>
+    <rect x="-8" y="10" width="16" height="4" rx="1" fill="#FF6B00"/>
+  </g>
+  <!-- Connector Head (Right) -->
+  <g transform="translate(90, 25) rotate(45)" filter="url(#cableShadow)">
+    <rect x="-8" y="-12" width="16" height="24" rx="4" fill="#263238"/>
+    <rect x="-5" y="-18" width="10" height="7" rx="2" fill="url(#metalGrad)"/>
+    <rect x="-8" y="10" width="16" height="4" rx="1" fill="#FF6B00"/>
+  </g>
+</svg>

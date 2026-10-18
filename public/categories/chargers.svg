@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF9F2"/>
+      <stop offset="100%" stop-color="#FFEEDD"/>
+    </linearGradient>
+    <linearGradient id="chargerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#EDEDED"/>
+    </linearGradient>
+    <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFA033"/>
+      <stop offset="100%" stop-color="#FF5500"/>
+    </linearGradient>
+    <filter id="chargerShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#000000" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="120" height="120" rx="30" fill="url(#bgGrad2)"/>
+  <!-- Wall Charger Plug Pins -->
+  <rect x="47" y="18" width="6" height="16" rx="2" fill="#B0BEC5"/>
+  <rect x="67" y="18" width="6" height="16" rx="2" fill="#B0BEC5"/>
+  <!-- Charger Main Body -->
+  <rect x="35" y="30" width="50" height="58" rx="14" fill="url(#chargerGrad)" filter="url(#chargerShadow)" stroke="#E0E0E0" stroke-width="1.5"/>
+  <!-- Type C Port -->
+  <rect x="47" y="74" width="26" height="8" rx="4" fill="#37474F"/>
+  <rect x="52" y="76" width="16" height="4" rx="2" fill="#FF6B00"/>
+  <!-- Fast Charge Bolt Badge -->
+  <circle cx="60" cy="52" r="14" fill="#FFF3E8"/>
+  <path d="M62 43 L54 53 L59 53 L58 61 L66 51 L61 51 Z" fill="url(#boltGrad)"/>
+</svg>

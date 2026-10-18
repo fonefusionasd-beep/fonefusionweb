@@ -1,0 +1,151 @@
+// Mock data — replace with Supabase calls later
+import { Product, Category, Brand } from '@/types';
+
+export const categories: Category[] = [
+  { id: '1', name: 'Covers & Cases', icon: '📱', image: '/categories/covers.svg', slug: 'covers' },
+  { id: '2', name: 'Chargers', icon: '⚡', image: '/categories/chargers.svg', slug: 'chargers' },
+  { id: '3', name: 'Cables', icon: '🔌', image: '/categories/cables.svg', slug: 'cables' },
+  { id: '4', name: 'Earphones', icon: '🎧', image: '/categories/earphones.svg', slug: 'earphones' },
+  { id: '5', name: 'Screen Guards', icon: '🛡️', image: '/categories/screen-guards.svg', slug: 'screen-guards' },
+  { id: '6', name: 'Holders & Stands', icon: '🗜️', image: '/categories/holders.svg', slug: 'holders' },
+];
+
+export const brands: Brand[] = [
+  { id: '1', name: 'Samsung', slug: 'samsung' },
+  { id: '2', name: 'Apple', slug: 'apple' },
+  { id: '3', name: 'Realme', slug: 'realme' },
+  { id: '4', name: 'Redmi', slug: 'redmi' },
+  { id: '5', name: 'Vivo', slug: 'vivo' },
+  { id: '6', name: 'Oppo', slug: 'oppo' },
+];
+
+export const products: Product[] = [
+  {
+    id: '1',
+    name: 'Liquid Silicone Protective Case',
+    description: 'Soft-touch liquid silicone, microfiber lining, shockproof drop protection, wireless charging compatible.',
+    price: 299,
+    discount_price: 199,
+    category_id: '1',
+    brand_ids: ['1', '2', '3', '4', '5'],
+    stock: 50,
+    images: ['/categories/covers.svg'],
+    supported_models: [
+      'iPhone 13', 'iPhone 14', 'iPhone 15', 'iPhone 15 Pro', 'iPhone 15 Pro Max',
+      'Samsung S23 Ultra', 'Samsung S24', 'Samsung S24 Ultra', 'Samsung A54',
+      'OnePlus 11', 'OnePlus 12R', 'Redmi Note 13 Pro', 'Vivo V30 Pro'
+    ],
+    is_featured: true,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '2',
+    name: 'Crystal Clear Hard Armor Case',
+    description: 'Crystal clear anti-yellowing PC back, reinforced TPU shock bumper corners, camera bump protection.',
+    price: 349,
+    discount_price: 249,
+    category_id: '1',
+    brand_ids: ['2', '1'],
+    stock: 40,
+    images: ['/categories/covers.svg'],
+    supported_models: [
+      'iPhone 12', 'iPhone 13', 'iPhone 14 Pro', 'iPhone 15', 'iPhone 15 Pro',
+      'Samsung S23', 'Samsung S24 Ultra', 'Realme 12 Pro'
+    ],
+    is_featured: true,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '3',
+    name: '65W Fast Charger (Type-C)',
+    description: 'GaN technology, universal compatibility, foldable plug.',
+    price: 899,
+    discount_price: 649,
+    category_id: '2',
+    brand_ids: ['1', '3', '4', '5', '6'],
+    stock: 30,
+    images: ['/images/placeholder-product.png'],
+    is_featured: true,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '4',
+    name: 'Braided USB-C Cable 1.5m',
+    description: 'Nylon braided, 60W charging, data transfer 480Mbps.',
+    price: 249,
+    discount_price: 149,
+    category_id: '3',
+    brand_ids: ['1', '3', '4', '5', '6'],
+    stock: 100,
+    images: ['/images/placeholder-product.png'],
+    is_featured: false,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '5',
+    name: 'Wireless Earphones – Bass Pro',
+    description: 'Bluetooth 5.3, 30hr battery, active noise cancellation.',
+    price: 1299,
+    discount_price: 899,
+    category_id: '4',
+    brand_ids: ['1', '2', '3', '4', '5', '6'],
+    stock: 25,
+    images: ['/images/placeholder-product.png'],
+    is_featured: true,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '6',
+    name: 'Tempered Glass Screen Guard – Redmi Note 13',
+    description: '9H hardness, anti-fingerprint, full coverage, easy install kit.',
+    price: 149,
+    discount_price: 99,
+    category_id: '5',
+    brand_ids: ['4'],
+    stock: 80,
+    images: ['/images/placeholder-product.png'],
+    is_featured: false,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '7',
+    name: 'Adjustable Phone Ring Holder',
+    description: '360° rotation, magnetic car mount compatible, universal fit.',
+    price: 199,
+    discount_price: 129,
+    category_id: '6',
+    brand_ids: ['1', '2', '3', '4', '5', '6'],
+    stock: 60,
+    images: ['/images/placeholder-product.png'],
+    is_featured: false,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '8',
+    name: 'Leather Flip Cover – Vivo V30',
+    description: 'PU leather, card slots, stand function, magnetic closure.',
+    price: 399,
+    discount_price: 279,
+    category_id: '1',
+    brand_ids: ['5'],
+    stock: 35,
+    images: ['/images/placeholder-product.png'],
+    is_featured: true,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  },
+];
+
+export const getProductById = (id: string) => products.find((p) => p.id === id);
+export const getFeaturedProducts = () => products.filter((p) => p.is_featured);
+export const getProductsByCategory = (categoryId: string) =>
+  products.filter((p) => p.category_id === categoryId);
+export const getCategoryById = (id: string) => categories.find((c) => c.id === id);
+export const getBrandById = (id: string) => brands.find((b) => b.id === id);

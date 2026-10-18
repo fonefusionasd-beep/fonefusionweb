@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="shieldBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0F9FF"/>
+      <stop offset="100%" stop-color="#E0F2FE"/>
+    </linearGradient>
+    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#BAE6FD" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="shieldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B00"/>
+      <stop offset="100%" stop-color="#E55A00"/>
+    </linearGradient>
+    <filter id="glassShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#0284C7" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="120" height="120" rx="30" fill="url(#shieldBg)"/>
+  <!-- Phone outline under glass -->
+  <rect x="36" y="22" width="48" height="76" rx="10" fill="#0F172A" stroke="#38BDF8" stroke-width="1.5"/>
+  <!-- 9H Hardness Tempered Glass Layer (Floating slightly) -->
+  <rect x="40" y="26" width="40" height="68" rx="8" fill="url(#glassGrad)" filter="url(#glassShadow)" stroke="#FFFFFF" stroke-width="2"/>
+  <!-- Glass Reflection Sheen -->
+  <path d="M42 30 L65 30 L45 88 L42 88 Z" fill="#FFFFFF" opacity="0.35"/>
+  <!-- Protective Shield Crest Badge -->
+  <g transform="translate(62, 54)">
+    <path d="M0 -14 L14 -9 C14 4 7 13 0 18 C-7 13 -14 4 -14 -9 Z" fill="url(#shieldBorder)"/>
+    <!-- 9H Text inside crest -->
+    <text x="0" y="3" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="10" fill="#FFFFFF">9H</text>
+  </g>
+</svg>
