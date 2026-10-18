@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import Image from 'next/image';
 import { Filter, X, Search, Smartphone } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { products, categories, brands } from '@/lib/data';
 import ProductCard from '@/components/products/ProductCard';
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const initCategory = searchParams.get('category') || '';
   const initBrand = searchParams.get('brand') || '';
@@ -260,5 +260,18 @@ export default function ProductsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <div className="inline-block w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-gray-500 font-medium">Loading products...</p>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }
