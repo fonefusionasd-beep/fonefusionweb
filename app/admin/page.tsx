@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   LayoutDashboard, Package, ShoppingBag, Tag, Smartphone,
   TrendingUp, Clock, CheckCircle, AlertCircle, LogOut, Menu, X,
-  MessageCircle, Settings
+  MessageCircle, Settings, Eye, EyeOff, CreditCard, Save, CheckCheck
 } from 'lucide-react';
 import { products, categories } from '@/lib/data';
 import { formatPrice } from '@/lib/utils';
@@ -44,7 +44,21 @@ const statusConfig: Record<string, { label: string; class: string }> = {
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { whatsappEnabled, setWhatsappEnabled, codEnabled, setCodEnabled } = useSettingsStore();
+  const {
+    whatsappEnabled, setWhatsappEnabled,
+    codEnabled, setCodEnabled,
+    payuEnabled, setPayuEnabled,
+    payuKey, setPayuKey,
+    payuSalt, setPayuSalt,
+    payuEnv, setPayuEnv,
+  } = useSettingsStore();
+  const [payuSaved, setPayuSaved] = useState(false);
+  const [showSalt, setShowSalt] = useState(false);
+
+  const savePayu = () => {
+    setPayuSaved(true);
+    setTimeout(() => setPayuSaved(false), 2000);
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -202,6 +216,116 @@ export default function AdminDashboard() {
             <div className="mt-3 space-y-1">
               <p className="text-xs text-gray-400">{whatsappEnabled ? '✅ WhatsApp button: visible' : '⛔ WhatsApp button: hidden'}</p>
               <p className="text-xs text-gray-400">{codEnabled ? '✅ COD: checkout mein enabled' : '⛔ COD: checkout mein disabled'}</p>
+              <p className="text-xs text-gray-400">{payuEnabled ? `✅ PayU Gateway: Active (${payuEnv.toUpperCase()})` : '⛔ PayU Gateway: Disabled'}</p>
+            </div>
+          </div>
+
+          {/* ── PayU Payment Gateway Config ── */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+                  <CreditCard size={18} className="text-emerald-600" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-gray-900">PayU Payment Gateway</h2>
+                  <p className="text-xs text-gray-400">Manage online payments (UPI, Cards, Net Banking)</p>
+                </div>
+              </div>
+              {/* Enable / Disable Switch */}
+              <button
+                type="button"
+                onClick={() => setPayuEnabled(!payuEnabled)}
+                className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none ${payuEnabled ? 'bg-emerald-500' : 'bg-gray-200'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${payuEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+              </button>
+            </div>
+
+            {/* PayU Form Fields */}
+            <div className="space-y-4 pt-2 border-t border-gray-100">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Environment Mode */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Environment Mode</label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPayuEnv('test')}
+                      className={`flex-1 py-2 px-3 text-xs font-semibold rounded-xl border transition-all ${payuEnv === 'test' ? 'bg-orange-50 border-orange-500 text-orange-600' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      🧪 Test / Sandbox
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPayuEnv('live')}
+                      className={`flex-1 py-2 px-3 text-xs font-semibold rounded-xl border transition-all ${payuEnv === 'live' ? 'bg-emerald-50 border-emerald-500 text-emerald-600' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      🚀 Live / Production
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    {payuEnv === 'test' ? 'Uses test.payu.in for demo payments' : 'Processes real money via secure.payu.in'}
+                  </p>
+                </div>
+
+                {/* Merchant Key */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Merchant Key</label>
+                  <input
+                    type="text"
+                    placeholder="Enter PayU Merchant Key..."
+                    value={payuKey}
+                    onChange={(e) => setPayuKey(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-mono focus:outline-none focus:border-orange-500"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1">Found in your PayU Dashboard &gt; Integration Details</p>
+                </div>
+              </div>
+
+              {/* Merchant Salt */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1.5">Merchant Salt</label>
+                <div className="relative">
+                  <input
+                    type={showSalt ? 'text' : 'password'}
+                    placeholder="Enter PayU Merchant Salt..."
+                    value={payuSalt}
+                    onChange={(e) => setPayuSalt(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl pl-3.5 pr-10 py-2 text-xs font-mono focus:outline-none focus:border-orange-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSalt(!showSalt)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showSalt ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+                <p className="text-[11px] text-gray-400 mt-1">Used for cryptographic SHA512 security hash generation</p>
+              </div>
+
+              {/* Save Button */}
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-xs text-gray-400">
+                  {payuEnabled ? (payuKey && payuSalt ? '🟢 Ready to accept payments' : '⚠️ Enter Key & Salt to activate') : '⚪ Gateway is currently paused'}
+                </span>
+                <button
+                  type="button"
+                  onClick={savePayu}
+                  className="flex items-center gap-1.5 bg-gray-900 hover:bg-black text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm"
+                >
+                  {payuSaved ? (
+                    <>
+                      <CheckCheck size={14} className="text-emerald-400" /> Saved!
+                    </>
+                  ) : (
+                    <>
+                      <Save size={14} /> Save Config
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 

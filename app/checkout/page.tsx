@@ -8,8 +8,9 @@ import { formatPrice } from '@/lib/utils';
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCartStore();
-  const { codEnabled } = useSettingsStore();
+  const { codEnabled, payuEnabled, payuEnv, payuKey } = useSettingsStore();
   const [form, setForm] = useState({ name: '', phone: '', email: '', address: '', city: '', pincode: '' });
+  const [paymentMethod, setPaymentMethod] = useState<'payu' | 'razorpay' | 'cod'>('cod');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -129,21 +130,59 @@ export default function CheckoutPage() {
           <div className="bg-white border border-gray-100 rounded-2xl p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4">Payment Method</h2>
             <div className="space-y-3">
-              {/* Online Payment - always shown */}
-              <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-orange-300 transition-colors">
-                <input type="radio" name="payment" value="razorpay" defaultChecked className="mt-0.5 accent-orange-500" />
+              {/* PayU Gateway (when enabled in Admin) */}
+              {payuEnabled && (
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'payu' ? 'border-orange-500 bg-orange-50/20' : 'border-gray-200 hover:border-orange-300'}`}>
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="payu"
+                    checked={paymentMethod === 'payu'}
+                    onChange={() => setPaymentMethod('payu')}
+                    className="mt-0.5 accent-orange-500"
+                  />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-gray-800">⚡ Pay with PayU (UPI, Cards, Net Banking)</p>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${payuEnv === 'live' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                        {payuEnv.toUpperCase()}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5">Pay via Google Pay, PhonePe, Paytm, Debit/Credit Card or Net Banking</p>
+                  </div>
+                </label>
+              )}
+
+              {/* Standard Online Payment */}
+              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'razorpay' ? 'border-orange-500 bg-orange-50/20' : 'border-gray-200 hover:border-orange-300'}`}>
+                <input
+                  type="radio"
+                  name="payment"
+                  value="razorpay"
+                  checked={paymentMethod === 'razorpay'}
+                  onChange={() => setPaymentMethod('razorpay')}
+                  className="mt-0.5 accent-orange-500"
+                />
                 <div>
-                  <p className="text-sm font-medium text-gray-800">💳 Online Payment (UPI, Cards, Net Banking)</p>
-                  <p className="text-xs text-gray-500">Powered by Razorpay — 100% safe &amp; instant</p>
+                  <p className="text-sm font-medium text-gray-800">💳 Online Payment (Razorpay / Instant UPI)</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Instant confirmation via Razorpay secure checkout</p>
                 </div>
               </label>
+
               {/* COD - only shown when admin has enabled it */}
               {codEnabled && (
-                <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-orange-300 transition-colors">
-                  <input type="radio" name="payment" value="cod" className="mt-0.5 accent-orange-500" />
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-orange-500 bg-orange-50/20' : 'border-gray-200 hover:border-orange-300'}`}>
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="cod"
+                    checked={paymentMethod === 'cod'}
+                    onChange={() => setPaymentMethod('cod')}
+                    className="mt-0.5 accent-orange-500"
+                  />
                   <div>
                     <p className="text-sm font-medium text-gray-800">💵 Cash on Delivery (COD)</p>
-                    <p className="text-xs text-gray-500">Pay with cash or UPI upon delivery at your doorstep</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Pay with cash or UPI upon delivery at your doorstep</p>
                   </div>
                 </label>
               )}

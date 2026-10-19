@@ -75,6 +75,15 @@ interface SettingsStore {
   setWhatsappEnabled: (val: boolean) => void;
   codEnabled: boolean;
   setCodEnabled: (val: boolean) => void;
+  // PayU
+  payuEnabled: boolean;
+  payuKey: string;
+  payuSalt: string;
+  payuEnv: 'test' | 'live';
+  setPayuEnabled: (val: boolean) => void;
+  setPayuKey: (val: string) => void;
+  setPayuSalt: (val: string) => void;
+  setPayuEnv: (val: 'test' | 'live') => void;
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -82,8 +91,16 @@ export const useSettingsStore = create<SettingsStore>()(
     (set) => ({
       whatsappEnabled: false,
       setWhatsappEnabled: (val) => set({ whatsappEnabled: val }),
-      codEnabled: true, // default ON
+      codEnabled: true,
       setCodEnabled: (val) => set({ codEnabled: val }),
+      payuEnabled: false,
+      payuKey: '',
+      payuSalt: '',
+      payuEnv: 'test',
+      setPayuEnabled: (val) => set({ payuEnabled: val }),
+      setPayuKey: (val) => set({ payuKey: val }),
+      setPayuSalt: (val) => set({ payuSalt: val }),
+      setPayuEnv: (val) => set({ payuEnv: val }),
     }),
     {
       name: 'fone-fusion-settings',
