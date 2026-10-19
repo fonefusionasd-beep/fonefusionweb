@@ -4,10 +4,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import {
   LayoutDashboard, Package, ShoppingBag, Tag, Smartphone,
-  TrendingUp, Clock, CheckCircle, AlertCircle, LogOut, Menu, X
+  TrendingUp, Clock, CheckCircle, AlertCircle, LogOut, Menu, X,
+  MessageCircle, Settings
 } from 'lucide-react';
 import { products, categories } from '@/lib/data';
 import { formatPrice } from '@/lib/utils';
+import { useSettingsStore } from '@/lib/store';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -42,6 +44,7 @@ const statusConfig: Record<string, { label: string; class: string }> = {
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { whatsappEnabled, setWhatsappEnabled } = useSettingsStore();
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -148,6 +151,39 @@ export default function AdminDashboard() {
                 <p className="text-gray-400 text-sm">{stats.pendingOrders} pending</p>
               </div>
             </Link>
+          </div>
+
+          {/* ── Site Settings ── */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Settings size={18} className="text-orange-500" />
+              <h2 className="font-bold text-gray-900">Site Settings</h2>
+            </div>
+            <div className="flex items-center justify-between py-3 border-b border-gray-50">
+              <div className="flex items-center gap-3">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${whatsappEnabled ? 'bg-green-100' : 'bg-gray-100'}`}>
+                  <MessageCircle size={18} className={whatsappEnabled ? 'text-green-600' : 'text-gray-400'} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">WhatsApp Floating Button</p>
+                  <p className="text-xs text-gray-400">Website par WhatsApp icon dikhaye</p>
+                </div>
+              </div>
+              {/* Toggle Switch */}
+              <button
+                onClick={() => setWhatsappEnabled(!whatsappEnabled)}
+                className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none ${whatsappEnabled ? 'bg-green-500' : 'bg-gray-200'}`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${whatsappEnabled ? 'translate-x-6' : 'translate-x-0'}`}
+                />
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 mt-3">
+              {whatsappEnabled
+                ? '✅ WhatsApp button website par visible hai'
+                : '⛔ WhatsApp button website par hidden hai'}
+            </p>
           </div>
 
           {/* Recent Orders */}
