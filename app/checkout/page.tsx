@@ -108,6 +108,17 @@ export default function CheckoutPage() {
     clearCart();
     setSuccess(true);
     setLoading(false);
+
+    // Auto-open WhatsApp message to Store Owner (+91 95419 74000) automatically without waiting
+    try {
+      const itemsSummary = newOrder.items.map(it => `• ${it.product_name} x${it.quantity}`).join('\n');
+      const autoMsg = encodeURIComponent(
+        `🔔 *NEW ORDER RECEIVED!*\n\n*Order ID:* ${newOrder.id}\n*Customer:* ${newOrder.customer_name}\n*Phone:* ${newOrder.customer_phone}\n*Address:* ${newOrder.customer_address}\n\n*Items:*\n${itemsSummary}\n\n*Total:* ${formatPrice(newOrder.total_amount)}\n*Payment:* Cash on Delivery (COD)`
+      );
+      window.open(`https://wa.me/919541974000?text=${autoMsg}`, '_blank');
+    } catch (e) {
+      // Browser popup fallback
+    }
   };
 
   if (items.length === 0 && !success) {
