@@ -150,7 +150,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <p className="font-bold">View Orders</p>
-                <p className="text-gray-400 text-sm">{stats.pendingOrders} pending</p>
+                <p className="text-gray-400 text-sm">{pendingCount} pending</p>
               </div>
             </Link>
           </div>
