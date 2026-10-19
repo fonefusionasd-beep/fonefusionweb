@@ -24,9 +24,58 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // TODO: Integrate Razorpay here
-    // For now, simulate a payment
-    await new Promise((r) => setTimeout(r, 1500));
+
+    if (paymentMethod === 'payu') {
+      try {
+        const productTitles = items.map((i) => i.product.name).join(', ').substring(0, 50);
+        const res = await fetch('/api/payu/initiate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: grandTotal,
+            productinfo: productTitles || 'Mobile Accessories',
+            firstname: form.name,
+            email: form.email || `${form.phone}@fonefusion.in`,
+            phone: form.phone,
+            key: payuKey,
+            salt: useSettingsStore.getState().payuSalt,
+            env: payuEnv,
+          }),
+        });
+
+        const data = await res.json();
+        if (data.success && data.action && data.params) {
+          // Create dynamic hidden form and auto-submit to PayU Gateway
+          const payuForm = document.createElement('form');
+          payuForm.method = 'POST';
+          payuForm.action = data.action;
+
+          Object.keys(data.params).forEach((key) => {
+            const hiddenField = document.createElement('input');
+            hiddenField.type = 'hidden';
+            hiddenField.name = key;
+            hiddenField.value = data.params[key];
+            payuForm.appendChild(hiddenField);
+          });
+
+          document.body.appendChild(payuForm);
+          clearCart();
+          payuForm.submit();
+          return;
+        } else {
+          alert('PayU payment initiation failed: ' + (data.error || 'Please check PayU Key and Salt in Admin.'));
+          setLoading(false);
+          return;
+        }
+      } catch (err: any) {
+        alert('Payment gateway connection error: ' + err.message);
+        setLoading(false);
+        return;
+      }
+    }
+
+    // Cash on Delivery (COD) or other modes
+    await new Promise((r) => setTimeout(r, 1200));
     clearCart();
     setSuccess(true);
     setLoading(false);
