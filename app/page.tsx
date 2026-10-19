@@ -33,14 +33,12 @@ export default function HomePage() {
                 >
                   Shop Now <ArrowRight size={18} />
                 </Link>
-                <a
-                  href="https://wa.me/919541974000?text=Hello%20Fone%20Fusion!%20I%20am%20interested%20in%20your%20products"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/products?category=covers"
                   className="bg-white/20 backdrop-blur text-white font-semibold px-8 py-3 rounded-xl hover:bg-white/30 transition-colors inline-flex items-center justify-center gap-2"
                 >
-                  Order on WhatsApp
-                </a>
+                  Browse Covers
+                </Link>
               </div>
             </div>
             <div className="flex-1 flex justify-center">
@@ -71,7 +69,7 @@ export default function HomePage() {
               { icon: Truck, title: 'Fast Delivery', desc: 'Pan India shipping' },
               { icon: Shield, title: 'Genuine Products', desc: '100% authentic' },
               { icon: RefreshCw, title: 'Easy Returns', desc: '7-day return policy' },
-              { icon: Headphones, title: '24/7 Support', desc: 'WhatsApp support' },
+              { icon: Headphones, title: 'Dedicated Support', desc: 'Quick customer assistance' },
             ].map(({ icon: Icon, title, desc }) => (
               <div key={title} className="flex items-center gap-3 bg-white p-4 rounded-xl border border-gray-100">
                 <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -108,22 +106,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== BANNER — WhatsApp Order ===== */}
+      {/* ===== BANNER — Quality & Fast Dispatch ===== */}
       <section className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-8 text-white text-center">
-          <div className="text-4xl mb-3">💬</div>
-          <h3 className="text-2xl font-bold mb-2">Can&apos;t find what you need?</h3>
-          <p className="text-green-100 mb-6">
-            Send us a WhatsApp message and we&apos;ll arrange it for you!
+        <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-8 text-white text-center shadow-lg shadow-orange-500/10">
+          <div className="text-4xl mb-3">⚡</div>
+          <h3 className="text-2xl font-bold mb-2">Looking for the Perfect Fit for Your Phone?</h3>
+          <p className="text-orange-100 mb-6 max-w-xl mx-auto text-sm sm:text-base">
+            Select your exact phone model (iPhone, Samsung, Vivo, Redmi & more) and get precision-engineered covers delivered fast.
           </p>
-          <a
-            href="https://wa.me/919541974000?text=Hello%20Fone%20Fusion!%20I%20am%20looking%20for..."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-white text-green-600 font-bold px-8 py-3 rounded-xl hover:bg-green-50 transition-colors"
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 bg-white text-orange-600 font-bold px-8 py-3 rounded-xl hover:bg-orange-50 transition-colors shadow-sm"
           >
-            Chat on WhatsApp
-          </a>
+            Explore All Accessories <ArrowRight size={16} />
+          </Link>
         </div>
       </section>
 

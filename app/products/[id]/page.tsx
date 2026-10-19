@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, notFound } from 'next/navigation';
-import { ShoppingCart, MessageCircle, Star, ChevronLeft, Plus, Minus, Shield, Truck, Search, Check, Smartphone } from 'lucide-react';
+import { ShoppingCart, Star, ChevronLeft, Plus, Minus, Shield, Truck, Search, Check, Smartphone } from 'lucide-react';
 import { getProductById, getCategoryById, getBrandById, products } from '@/lib/data';
 import { formatPrice, discountPercent } from '@/lib/utils';
 import { useCartStore } from '@/lib/store';
@@ -45,10 +45,6 @@ export default function ProductDetailPage() {
       : product;
     addItem(customProduct, qty);
   };
-
-  const whatsappMsg = encodeURIComponent(
-    `Hi Fone Fusion! I want to order:\n*${product.name}*${selectedModel ? `\nModel: *${selectedModel}*` : ''}\nQty: ${qty}\nPrice: ${formatPrice(product.discount_price ?? product.price)}`
-  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -183,7 +179,7 @@ export default function ProductDetailPage() {
                   })
                 ) : (
                   <p className="text-xs text-gray-400 py-2">
-                    Model not found. Click &quot;Order on WhatsApp&quot; to ask for your model!
+                    Model not found in list. Please check the model name or contact store.
                   </p>
                 )}
               </div>
@@ -210,7 +206,7 @@ export default function ProductDetailPage() {
           </p>
 
           {/* Qty + Add to cart */}
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-6">
             <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
               <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100">
                 <Minus size={16} />
@@ -223,23 +219,12 @@ export default function ProductDetailPage() {
             <button
               onClick={handleAddToCart}
               disabled={product.stock === 0}
-              className="flex-1 flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-200 text-white font-bold py-3 px-6 rounded-xl transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-200 text-white font-bold py-3.5 px-6 rounded-xl transition-colors shadow-md shadow-orange-500/20"
             >
               <ShoppingCart size={18} />
               Add to Cart
             </button>
           </div>
-
-          {/* WhatsApp order */}
-          <a
-            href={`https://wa.me/919541974000?text=${whatsappMsg}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl transition-colors mb-5"
-          >
-            <MessageCircle size={18} />
-            Order on WhatsApp
-          </a>
 
           {/* Trust */}
           <div className="grid grid-cols-2 gap-3">

@@ -21,7 +21,7 @@ export default function Navbar() {
       <div className="bg-orange-600 text-white text-xs py-1.5 text-center tracking-wide">
         <span className="flex items-center justify-center gap-2">
           <Phone size={12} />
-          Free delivery on orders above ₹499 &nbsp;|&nbsp; WhatsApp: +91 95419 74000
+          Free delivery on orders above ₹499 &nbsp;|&nbsp; Support: +91 95419 74000
         </span>
       </div>
 

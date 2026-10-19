@@ -131,19 +131,10 @@ export default function CartPage() {
 
             <Link
               href="/checkout"
-              className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl transition-colors mb-3"
+              className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl transition-colors mb-3 shadow-md shadow-orange-500/20"
             >
               Proceed to Checkout <ArrowRight size={18} />
             </Link>
-
-            <a
-              href={`https://wa.me/919541974000?text=${encodeURIComponent('Hi Fone Fusion! I want to place an order:\n\n' + items.map(i => `• ${i.product.name} x${i.quantity} = ${formatPrice((i.product.discount_price ?? i.product.price) * i.quantity)}`).join('\n') + `\n\nTotal: ${formatPrice(grandTotal)}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 rounded-xl transition-colors"
-            >
-              Order on WhatsApp
-            </a>
 
             <Link href="/products" className="block text-center text-sm text-orange-500 hover:text-orange-600 mt-4">
               ← Continue Shopping

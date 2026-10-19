@@ -50,19 +50,20 @@ export default function CheckoutPage() {
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed! 🎉</h2>
         <p className="text-gray-500 mb-2">Thank you, <strong>{form.name || 'Customer'}</strong>!</p>
-        <p className="text-gray-500 mb-8">We will contact you on <strong>{form.phone}</strong> for delivery updates.</p>
-        <a
-          href={`https://wa.me/919541974000?text=${encodeURIComponent('Hi! My order has been placed. Please confirm.')}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-xl mb-4 transition-colors"
-        >
-          Confirm on WhatsApp
-        </a>
-        <br />
-        <Link href="/products" className="text-orange-500 hover:text-orange-600 font-medium">
-          Continue Shopping →
-        </Link>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl transition-colors shadow-md shadow-orange-500/20"
+          >
+            Continue Shopping →
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-colors"
+          >
+            Back to Home
+          </Link>
+        </div>
       </div>
     );
   }
@@ -128,8 +129,8 @@ export default function CheckoutPage() {
             <h2 className="text-lg font-bold text-gray-900 mb-4">Payment Method</h2>
             <div className="space-y-3">
               {[
-                { id: 'razorpay', label: '💳 Online Payment (UPI, Cards, Net Banking)', sub: 'Powered by Razorpay — safe & secure' },
-                { id: 'whatsapp', label: '💬 Pay via WhatsApp', sub: 'We will send payment link on WhatsApp' },
+                { id: 'razorpay', label: '💳 Online Payment (UPI, Cards, Net Banking)', sub: 'Powered by Razorpay — 100% safe & instant' },
+                { id: 'cod', label: '💵 Cash on Delivery (COD)', sub: 'Pay with cash or UPI upon delivery at your doorstep' },
               ].map((opt) => (
                 <label key={opt.id} className="flex items-start gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-orange-300 transition-colors">
                   <input type="radio" name="payment" value={opt.id} defaultChecked={opt.id === 'razorpay'} className="mt-0.5 accent-orange-500" />

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Zap, Phone, MapPin, Mail, MessageCircle } from 'lucide-react';
+import { Zap, Phone, MapPin, Mail } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -20,16 +20,6 @@ export default function Footer() {
             <p className="text-sm text-gray-400 mb-4 max-w-xs">
               Your one-stop shop for premium mobile accessories — covers, chargers, cables, earphones and more.
             </p>
-            {/* WhatsApp CTA */}
-            <a
-              href="https://wa.me/919541974000?text=Hello!%20I%20want%20to%20order%20from%20Fone%20Fusion"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            >
-              <MessageCircle size={16} />
-              Order on WhatsApp
-            </a>
           </div>
 
           {/* Quick Links */}
