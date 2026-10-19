@@ -93,7 +93,7 @@ export const useSettingsStore = create<SettingsStore>()(
       setWhatsappEnabled: (val) => set({ whatsappEnabled: val }),
       codEnabled: true,
       setCodEnabled: (val) => set({ codEnabled: val }),
-      payuEnabled: false,
+      payuEnabled: true, // Default ON so PayU payment option is immediately visible
       payuKey: '',
       payuSalt: '',
       payuEnv: 'test',

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ShoppingBag, CheckCircle } from 'lucide-react';
 import { useCartStore, useSettingsStore } from '@/lib/store';
@@ -10,9 +10,14 @@ export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCartStore();
   const { codEnabled, payuEnabled, payuEnv, payuKey } = useSettingsStore();
   const [form, setForm] = useState({ name: '', phone: '', email: '', address: '', city: '', pincode: '' });
-  const [paymentMethod, setPaymentMethod] = useState<'payu' | 'razorpay' | 'cod'>('cod');
+  const [paymentMethod, setPaymentMethod] = useState<'payu' | 'cod'>('payu');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const shipping = totalPrice() >= 499 ? 0 : 49;
   const grandTotal = totalPrice() + shipping;
@@ -179,59 +184,41 @@ export default function CheckoutPage() {
           <div className="bg-white border border-gray-100 rounded-2xl p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4">Payment Method</h2>
             <div className="space-y-3">
-              {/* PayU Gateway (when enabled in Admin) */}
-              {payuEnabled && (
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'payu' ? 'border-orange-500 bg-orange-50/20' : 'border-gray-200 hover:border-orange-300'}`}>
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="payu"
-                    checked={paymentMethod === 'payu'}
-                    onChange={() => setPaymentMethod('payu')}
-                    className="mt-0.5 accent-orange-500"
-                  />
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold text-gray-800">⚡ Pay with PayU (UPI, Cards, Net Banking)</p>
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${payuEnv === 'live' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                        {payuEnv.toUpperCase()}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-0.5">Pay via Google Pay, PhonePe, Paytm, Debit/Credit Card or Net Banking</p>
-                  </div>
-                </label>
-              )}
-
-              {/* Standard Online Payment */}
-              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'razorpay' ? 'border-orange-500 bg-orange-50/20' : 'border-gray-200 hover:border-orange-300'}`}>
+              {/* PayU Gateway (Primary Online Payment) */}
+              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'payu' ? 'border-orange-500 bg-orange-50/20 ring-2 ring-orange-500/20' : 'border-gray-200 hover:border-orange-300'}`}>
                 <input
                   type="radio"
                   name="payment"
-                  value="razorpay"
-                  checked={paymentMethod === 'razorpay'}
-                  onChange={() => setPaymentMethod('razorpay')}
-                  className="mt-0.5 accent-orange-500"
+                  value="payu"
+                  checked={paymentMethod === 'payu'}
+                  onChange={() => setPaymentMethod('payu')}
+                  className="mt-0.5 accent-orange-500 w-4 h-4"
                 />
-                <div>
-                  <p className="text-sm font-medium text-gray-800">💳 Online Payment (Razorpay / Instant UPI)</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Instant confirmation via Razorpay secure checkout</p>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-bold text-gray-900">⚡ Online Payment (UPI, Cards, Net Banking)</p>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                      PayU Secure
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Google Pay, PhonePe, Paytm, All UPI apps, Debit/Credit Cards & Net Banking</p>
                 </div>
               </label>
 
               {/* COD - only shown when admin has enabled it */}
-              {codEnabled && (
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-orange-500 bg-orange-50/20' : 'border-gray-200 hover:border-orange-300'}`}>
+              {(!mounted || codEnabled) && (
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-orange-500 bg-orange-50/20 ring-2 ring-orange-500/20' : 'border-gray-200 hover:border-orange-300'}`}>
                   <input
                     type="radio"
                     name="payment"
                     value="cod"
                     checked={paymentMethod === 'cod'}
                     onChange={() => setPaymentMethod('cod')}
-                    className="mt-0.5 accent-orange-500"
+                    className="mt-0.5 accent-orange-500 w-4 h-4"
                   />
                   <div>
-                    <p className="text-sm font-medium text-gray-800">💵 Cash on Delivery (COD)</p>
-                    <p className="text-xs text-gray-500 mt-0.5">Pay with cash or UPI upon delivery at your doorstep</p>
+                    <p className="text-sm font-bold text-gray-900">💵 Cash on Delivery (COD)</p>
+                    <p className="text-xs text-gray-500 mt-1">Pay with cash or UPI upon delivery at your doorstep</p>
                   </div>
                 </label>
               )}
@@ -241,7 +228,7 @@ export default function CheckoutPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-bold py-4 rounded-xl transition-colors text-lg"
+            className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-bold py-4 rounded-xl transition-colors text-lg shadow-lg shadow-orange-500/20"
           >
             {loading ? (
               <span className="flex items-center gap-2">
@@ -249,10 +236,12 @@ export default function CheckoutPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Processing...
+                {paymentMethod === 'payu' ? 'Redirecting to PayU Gateway...' : 'Placing Order...'}
               </span>
             ) : (
-              <>Place Order — {formatPrice(grandTotal)}</>
+              <>
+                {paymentMethod === 'payu' ? `Proceed to Pay — ${formatPrice(grandTotal)}` : `Place Order (COD) — ${formatPrice(grandTotal)}`}
+              </>
             )}
           </button>
         </form>
