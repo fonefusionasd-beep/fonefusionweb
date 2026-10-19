@@ -9,29 +9,13 @@ import {
 } from 'lucide-react';
 import { products, categories } from '@/lib/data';
 import { formatPrice } from '@/lib/utils';
-import { useSettingsStore } from '@/lib/store';
+import { useSettingsStore, useOrderStore } from '@/lib/store';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/categories', label: 'Categories & Photos', icon: Tag },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
-];
-
-// Mock stats
-const stats = {
-  totalRevenue: 45280,
-  totalOrders: 38,
-  pendingOrders: 7,
-  totalProducts: products.length,
-};
-
-const recentOrders = [
-  { id: 'ORD-001', customer: 'Rahul Sharma', amount: 649, status: 'delivered', items: 2, time: '2h ago' },
-  { id: 'ORD-002', customer: 'Priya Singh', amount: 1299, status: 'shipped', items: 1, time: '4h ago' },
-  { id: 'ORD-003', customer: 'Amit Kumar', amount: 447, status: 'pending', items: 3, time: '5h ago' },
-  { id: 'ORD-004', customer: 'Sneha Patel', amount: 199, status: 'processing', items: 1, time: '8h ago' },
-  { id: 'ORD-005', customer: 'Vikram Rao', amount: 2398, status: 'pending', items: 2, time: '1d ago' },
 ];
 
 const statusConfig: Record<string, { label: string; class: string }> = {
@@ -44,6 +28,7 @@ const statusConfig: Record<string, { label: string; class: string }> = {
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { orders } = useOrderStore();
   const {
     whatsappEnabled, setWhatsappEnabled,
     codEnabled, setCodEnabled,
@@ -54,6 +39,9 @@ export default function AdminDashboard() {
   } = useSettingsStore();
   const [payuSaved, setPayuSaved] = useState(false);
   const [showSalt, setShowSalt] = useState(false);
+
+  const totalRevenue = orders.reduce((sum, o) => sum + (o.payment_status === 'paid' ? o.total_amount : 0), 0);
+  const pendingCount = orders.filter((o) => o.order_status === 'pending').length;
 
   const savePayu = () => {
     setPayuSaved(true);
@@ -130,10 +118,10 @@ export default function AdminDashboard() {
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: 'Total Revenue', value: formatPrice(stats.totalRevenue), icon: TrendingUp, color: 'text-orange-500', bg: 'bg-orange-50' },
-              { label: 'Total Orders', value: stats.totalOrders, icon: ShoppingBag, color: 'text-blue-500', bg: 'bg-blue-50' },
-              { label: 'Pending Orders', value: stats.pendingOrders, icon: Clock, color: 'text-yellow-500', bg: 'bg-yellow-50' },
-              { label: 'Total Products', value: stats.totalProducts, icon: Package, color: 'text-green-500', bg: 'bg-green-50' },
+              { label: 'Total Revenue', value: formatPrice(totalRevenue), icon: TrendingUp, color: 'text-orange-500', bg: 'bg-orange-50' },
+              { label: 'Total Orders', value: orders.length, icon: ShoppingBag, color: 'text-blue-500', bg: 'bg-blue-50' },
+              { label: 'Pending Orders', value: pendingCount, icon: Clock, color: 'text-yellow-500', bg: 'bg-yellow-50' },
+              { label: 'Total Products', value: products.length, icon: Package, color: 'text-green-500', bg: 'bg-green-50' },
             ].map((stat) => (
               <div key={stat.label} className="bg-white rounded-2xl p-5 border border-gray-100">
                 <div className={`w-10 h-10 ${stat.bg} rounded-xl flex items-center justify-center mb-3`}>
@@ -333,19 +321,23 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-2xl border border-gray-100">
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
               <h2 className="font-bold text-gray-900">Recent Orders</h2>
-              <Link href="/admin/orders" className="text-sm text-orange-500 hover:text-orange-600">View all →</Link>
+              <Link href="/admin/orders" className="text-sm text-orange-500 hover:text-orange-600 font-semibold">
+                View all ({orders.length}) →
+              </Link>
             </div>
             <div className="divide-y divide-gray-50">
-              {recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center gap-4 p-4">
+              {orders.slice(0, 5).map((order) => (
+                <div key={order.id} className="flex items-center gap-4 p-4 hover:bg-gray-50/50 transition-colors">
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 text-sm">{order.customer}</p>
-                    <p className="text-xs text-gray-400">{order.id} · {order.items} item(s) · {order.time}</p>
+                    <p className="font-medium text-gray-900 text-sm">{order.customer_name}</p>
+                    <p className="text-xs text-gray-400">
+                      #{order.id} · {order.items.length} item(s) · {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-gray-900 text-sm">{formatPrice(order.amount)}</p>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusConfig[order.status]?.class}`}>
-                      {statusConfig[order.status]?.label}
+                    <p className="font-bold text-gray-900 text-sm">{formatPrice(order.total_amount)}</p>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusConfig[order.order_status]?.class || 'bg-gray-100 text-gray-600'}`}>
+                      {statusConfig[order.order_status]?.label || order.order_status}
                     </span>
                   </div>
                 </div>

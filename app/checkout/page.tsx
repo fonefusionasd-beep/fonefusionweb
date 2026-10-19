@@ -3,16 +3,19 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ShoppingBag, CheckCircle } from 'lucide-react';
-import { useCartStore, useSettingsStore } from '@/lib/store';
+import { useCartStore, useSettingsStore, useOrderStore } from '@/lib/store';
 import { formatPrice } from '@/lib/utils';
+import { Order } from '@/types';
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCartStore();
   const { codEnabled, payuEnabled, payuEnv, payuKey } = useSettingsStore();
+  const { addOrder } = useOrderStore();
   const [form, setForm] = useState({ name: '', phone: '', email: '', address: '', city: '', pincode: '' });
   const [paymentMethod, setPaymentMethod] = useState<'payu' | 'cod'>('payu');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -30,8 +33,28 @@ export default function CheckoutPage() {
     e.preventDefault();
     setLoading(true);
 
+    const newOrder: Order = {
+      id: 'FF-' + Math.floor(100000 + Math.random() * 900000),
+      customer_name: form.name.trim() || 'Customer',
+      customer_phone: form.phone.trim(),
+      customer_email: form.email.trim(),
+      customer_address: `${form.address}, ${form.city} - ${form.pincode}`,
+      items: items.map((it) => ({
+        product_id: it.product.id,
+        product_name: it.product.name,
+        product_image: it.product.images[0] || '',
+        price: it.product.discount_price ?? it.product.price,
+        quantity: it.quantity,
+      })),
+      total_amount: grandTotal,
+      payment_status: paymentMethod === 'payu' ? 'paid' : 'pending',
+      order_status: 'pending',
+      created_at: new Date().toISOString(),
+    };
+
     if (paymentMethod === 'payu') {
       try {
+        addOrder(newOrder);
         const productTitles = items.map((i) => i.product.name).join(', ').substring(0, 50);
         const res = await fetch('/api/payu/initiate', {
           method: 'POST',
@@ -50,7 +73,6 @@ export default function CheckoutPage() {
 
         const data = await res.json();
         if (data.success && data.action && data.params) {
-          // Create dynamic hidden form and auto-submit to PayU Gateway
           const payuForm = document.createElement('form');
           payuForm.method = 'POST';
           payuForm.action = data.action;
@@ -79,8 +101,10 @@ export default function CheckoutPage() {
       }
     }
 
-    // Cash on Delivery (COD) or other modes
-    await new Promise((r) => setTimeout(r, 1200));
+    // Cash on Delivery (COD) mode
+    await new Promise((r) => setTimeout(r, 1000));
+    addOrder(newOrder);
+    setPlacedOrder(newOrder);
     clearCart();
     setSuccess(true);
     setLoading(false);
@@ -99,23 +123,71 @@ export default function CheckoutPage() {
   }
 
   if (success) {
+    const adminPhone = '919541974000';
+    const orderId = placedOrder?.id || 'FF-' + Math.floor(100000 + Math.random() * 900000);
+    const orderItemsSummary = placedOrder?.items.map(it => `• ${it.product_name} x${it.quantity}`).join('\n') || '';
+
+    // WhatsApp message to STORE OWNER (+91 95419 74000)
+    const storeOwnerMsg = encodeURIComponent(
+      `🔔 *NEW ORDER RECEIVED!*\n\n*Order ID:* ${orderId}\n*Customer:* ${form.name}\n*Phone:* ${form.phone}\n*Address:* ${form.address}, ${form.city} - ${form.pincode}\n\n*Items:*\n${orderItemsSummary}\n\n*Total Amount:* ${formatPrice(grandTotal)}\n*Payment:* ${paymentMethod === 'payu' ? 'Online (PayU)' : 'Cash on Delivery (COD)'}`
+    );
+
+    // WhatsApp message to CUSTOMER
+    const customerMsg = encodeURIComponent(
+      `Hi ${form.name}! 🎉\n\nThank you for ordering with *Fone Fusion*!\nYour Order ID is *#${orderId}*.\n\n*Order Summary:*\n${orderItemsSummary}\n\n*Total Amount:* ${formatPrice(grandTotal)}\n*Status:* Confirmed (Processing for Dispatch)\n\nFor any queries, reach us here anytime!`
+    );
+
     return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
+      <div className="max-w-lg mx-auto px-4 py-16 text-center">
+        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <CheckCircle size={40} className="text-green-500" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed! 🎉</h2>
-        <p className="text-gray-500 mb-2">Thank you, <strong>{form.name || 'Customer'}</strong>!</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-1">Order Confirmed! 🎉</h2>
+        <p className="text-sm font-mono text-orange-600 font-bold mb-3">Order ID: #{orderId}</p>
+        <p className="text-sm text-gray-500 mb-6">
+          Thank you, <strong>{form.name}</strong>! Your order has been registered in the system.
+        </p>
+
+        {/* WhatsApp Notification Actions Card */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mb-6 text-left space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">💬</span>
+            <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">WhatsApp Notifications</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {/* Send to Store Owner */}
+            <a
+              href={`https://wa.me/${adminPhone}?text=${storeOwnerMsg}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-3 rounded-xl text-xs transition-colors shadow-sm"
+            >
+              📱 Alert Store Owner
+            </a>
+
+            {/* Send confirmation to customer's WhatsApp */}
+            <a
+              href={`https://wa.me/${form.phone.replace(/[^0-9]/g, '')}?text=${customerMsg}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-3 rounded-xl text-xs transition-colors shadow-sm"
+            >
+              💬 WhatsApp Receipt
+            </a>
+          </div>
+        </div>
+
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl transition-colors shadow-md shadow-orange-500/20"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl transition-colors shadow-md shadow-orange-500/20 text-sm"
           >
             Continue Shopping →
           </Link>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
           >
             Back to Home
           </Link>
