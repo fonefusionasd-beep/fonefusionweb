@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ShoppingBag, CheckCircle } from 'lucide-react';
-import { useCartStore } from '@/lib/store';
+import { useCartStore, useSettingsStore } from '@/lib/store';
 import { formatPrice } from '@/lib/utils';
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCartStore();
+  const { codEnabled } = useSettingsStore();
   const [form, setForm] = useState({ name: '', phone: '', email: '', address: '', city: '', pincode: '' });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -128,18 +129,24 @@ export default function CheckoutPage() {
           <div className="bg-white border border-gray-100 rounded-2xl p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4">Payment Method</h2>
             <div className="space-y-3">
-              {[
-                { id: 'razorpay', label: '💳 Online Payment (UPI, Cards, Net Banking)', sub: 'Powered by Razorpay — 100% safe & instant' },
-                { id: 'cod', label: '💵 Cash on Delivery (COD)', sub: 'Pay with cash or UPI upon delivery at your doorstep' },
-              ].map((opt) => (
-                <label key={opt.id} className="flex items-start gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-orange-300 transition-colors">
-                  <input type="radio" name="payment" value={opt.id} defaultChecked={opt.id === 'razorpay'} className="mt-0.5 accent-orange-500" />
+              {/* Online Payment - always shown */}
+              <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-orange-300 transition-colors">
+                <input type="radio" name="payment" value="razorpay" defaultChecked className="mt-0.5 accent-orange-500" />
+                <div>
+                  <p className="text-sm font-medium text-gray-800">💳 Online Payment (UPI, Cards, Net Banking)</p>
+                  <p className="text-xs text-gray-500">Powered by Razorpay — 100% safe &amp; instant</p>
+                </div>
+              </label>
+              {/* COD - only shown when admin has enabled it */}
+              {codEnabled && (
+                <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-orange-300 transition-colors">
+                  <input type="radio" name="payment" value="cod" className="mt-0.5 accent-orange-500" />
                   <div>
-                    <p className="text-sm font-medium text-gray-800">{opt.label}</p>
-                    <p className="text-xs text-gray-500">{opt.sub}</p>
+                    <p className="text-sm font-medium text-gray-800">💵 Cash on Delivery (COD)</p>
+                    <p className="text-xs text-gray-500">Pay with cash or UPI upon delivery at your doorstep</p>
                   </div>
                 </label>
-              ))}
+              )}
             </div>
           </div>
 

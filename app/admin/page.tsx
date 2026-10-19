@@ -44,7 +44,7 @@ const statusConfig: Record<string, { label: string; class: string }> = {
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { whatsappEnabled, setWhatsappEnabled } = useSettingsStore();
+  const { whatsappEnabled, setWhatsappEnabled, codEnabled, setCodEnabled } = useSettingsStore();
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -159,31 +159,50 @@ export default function AdminDashboard() {
               <Settings size={18} className="text-orange-500" />
               <h2 className="font-bold text-gray-900">Site Settings</h2>
             </div>
-            <div className="flex items-center justify-between py-3 border-b border-gray-50">
+
+            {/* WhatsApp Toggle Row */}
+            <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <div className="flex items-center gap-3">
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${whatsappEnabled ? 'bg-green-100' : 'bg-gray-100'}`}>
                   <MessageCircle size={18} className={whatsappEnabled ? 'text-green-600' : 'text-gray-400'} />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">WhatsApp Floating Button</p>
-                  <p className="text-xs text-gray-400">Website par WhatsApp icon dikhaye</p>
+                  <p className="text-xs text-gray-400">Website par green WhatsApp icon dikhaye</p>
                 </div>
               </div>
-              {/* Toggle Switch */}
               <button
                 onClick={() => setWhatsappEnabled(!whatsappEnabled)}
                 className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none ${whatsappEnabled ? 'bg-green-500' : 'bg-gray-200'}`}
               >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${whatsappEnabled ? 'translate-x-6' : 'translate-x-0'}`}
-                />
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${whatsappEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
               </button>
             </div>
-            <p className="text-xs text-gray-400 mt-3">
-              {whatsappEnabled
-                ? '✅ WhatsApp button website par visible hai'
-                : '⛔ WhatsApp button website par hidden hai'}
-            </p>
+
+            {/* COD Toggle Row */}
+            <div className="flex items-center justify-between py-3 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${codEnabled ? 'bg-orange-100' : 'bg-gray-100'}`}>
+                  <span className={`text-base font-bold ${codEnabled ? 'text-orange-600' : 'text-gray-400'}`}>₹</span>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">Cash on Delivery (COD)</p>
+                  <p className="text-xs text-gray-400">Checkout mein COD payment option dikhaye</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setCodEnabled(!codEnabled)}
+                className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none ${codEnabled ? 'bg-orange-500' : 'bg-gray-200'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${codEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+              </button>
+            </div>
+
+            {/* Status summary */}
+            <div className="mt-3 space-y-1">
+              <p className="text-xs text-gray-400">{whatsappEnabled ? '✅ WhatsApp button: visible' : '⛔ WhatsApp button: hidden'}</p>
+              <p className="text-xs text-gray-400">{codEnabled ? '✅ COD: checkout mein enabled' : '⛔ COD: checkout mein disabled'}</p>
+            </div>
           </div>
 
           {/* Recent Orders */}

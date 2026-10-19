@@ -73,13 +73,17 @@ export const useCartStore = create<CartStore>()(
 interface SettingsStore {
   whatsappEnabled: boolean;
   setWhatsappEnabled: (val: boolean) => void;
+  codEnabled: boolean;
+  setCodEnabled: (val: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsStore>()(
   persist(
     (set) => ({
-      whatsappEnabled: false, // default OFF
+      whatsappEnabled: false,
       setWhatsappEnabled: (val) => set({ whatsappEnabled: val }),
+      codEnabled: true, // default ON
+      setCodEnabled: (val) => set({ codEnabled: val }),
     }),
     {
       name: 'fone-fusion-settings',
