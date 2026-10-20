@@ -26,50 +26,56 @@ export default function Navbar() {
       </div>
 
       {/* Main navbar */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
+      <header className="bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.04)] sticky top-0 z-50 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-17">
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                <Zap size={18} className="text-white" fill="white" />
+            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+              <div className="w-9 h-9 bg-gradient-to-tr from-orange-600 via-orange-500 to-amber-400 rounded-xl flex items-center justify-center shadow-md shadow-orange-500/25 group-hover:scale-105 transition-transform duration-200">
+                <Zap size={19} className="text-white" fill="white" />
               </div>
-              <span className="text-xl font-bold">
-                <span className="text-orange-500">Fone</span>
-                <span className="text-gray-900"> Fusion</span>
-              </span>
+              <div className="flex flex-col">
+                <span className="text-xl font-extrabold tracking-tight leading-none">
+                  <span className="text-orange-500">Fone</span>
+                  <span className="text-gray-900"> Fusion</span>
+                </span>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-gray-400 -mt-0.5">
+                  Premium Gear
+                </span>
+              </div>
             </Link>
 
             {/* Desktop Nav Links */}
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              <Link href="/" className="text-gray-700 hover:text-orange-500">Home</Link>
-              <Link href="/products" className="text-gray-700 hover:text-orange-500">All Products</Link>
-              <Link href="/products?category=covers" className="text-gray-700 hover:text-orange-500">Covers</Link>
-              <Link href="/products?category=chargers" className="text-gray-700 hover:text-orange-500">Chargers</Link>
-              <Link href="/products?category=earphones" className="text-gray-700 hover:text-orange-500">Earphones</Link>
+            <nav className="hidden md:flex items-center gap-1 text-sm font-semibold text-gray-600 bg-gray-50/80 p-1.5 rounded-2xl border border-gray-100">
+              <Link href="/" className="px-3.5 py-1.5 rounded-xl hover:text-orange-600 hover:bg-white transition-all">Home</Link>
+              <Link href="/products" className="px-3.5 py-1.5 rounded-xl hover:text-orange-600 hover:bg-white transition-all">All Products</Link>
+              <Link href="/products?category=covers" className="px-3.5 py-1.5 rounded-xl hover:text-orange-600 hover:bg-white transition-all">Covers</Link>
+              <Link href="/products?category=chargers" className="px-3.5 py-1.5 rounded-xl hover:text-orange-600 hover:bg-white transition-all">Chargers</Link>
+              <Link href="/products?category=earphones" className="px-3.5 py-1.5 rounded-xl hover:text-orange-600 hover:bg-white transition-all">Earphones</Link>
             </nav>
 
             {/* Right Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               {/* Search toggle */}
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
+                className="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-orange-500 hover:bg-orange-50 rounded-xl border border-gray-100 transition-colors"
                 aria-label="Search"
               >
-                <Search size={20} />
+                <Search size={18} />
               </button>
 
               {/* Cart */}
               <Link
                 href="/cart"
-                className="relative p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
+                className="relative flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold px-4 py-2 rounded-xl shadow-md shadow-orange-500/20 transition-all duration-200 active:scale-95"
                 aria-label="Cart"
               >
-                <ShoppingCart size={20} />
+                <ShoppingCart size={18} />
+                <span className="hidden sm:inline text-xs font-semibold">Cart</span>
                 {mounted && totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                  <span className="bg-white text-orange-600 text-[11px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
                     {totalItems > 9 ? '9+' : totalItems}
                   </span>
                 )}
@@ -77,7 +83,7 @@ export default function Navbar() {
 
               {/* Mobile menu */}
               <button
-                className="md:hidden p-2 text-gray-600 hover:text-orange-500"
+                className="md:hidden w-10 h-10 flex items-center justify-center text-gray-700 hover:text-orange-500 border border-gray-100 rounded-xl"
                 onClick={() => setMenuOpen(!menuOpen)}
                 aria-label="Menu"
               >
