@@ -77,3 +77,37 @@ export interface HeroBanner {
   display_order: number;
 }
 
+export interface CustomerUser {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  pincode?: string;
+  password?: string;
+  created_at: string;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discount_type: 'flat' | 'percentage' | 'free_shipping';
+  discount_value: number;
+  min_order_amount: number;
+  is_active: boolean;
+  description?: string;
+}
+
+export interface PincodeOffer {
+  id: string;
+  pincode: string;
+  city: string;
+  offer_type: 'free_delivery' | 'discount';
+  discount_amount?: number;
+  min_order: number;
+  is_active: boolean;
+  note?: string;
+}
+
+

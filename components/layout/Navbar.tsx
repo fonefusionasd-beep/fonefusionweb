@@ -2,14 +2,16 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Search, Menu, X, Phone, Zap } from 'lucide-react';
+import { ShoppingCart, Search, Menu, X, Phone, Zap, User } from 'lucide-react';
 import { useCartStore } from '@/lib/store';
+import { useCustomerStore } from '@/lib/customerStore';
 
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const totalItems = useCartStore((s) => s.totalItems());
+  const currentCustomer = useCustomerStore((s) => s.currentCustomer);
 
   useEffect(() => {
     setMounted(true);
@@ -66,6 +68,18 @@ export default function Navbar() {
                 <Search size={18} />
               </button>
 
+              {/* Account / My Orders */}
+              <Link
+                href={currentCustomer ? '/account' : '/account/login'}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-gray-700 hover:text-orange-600 hover:border-orange-300 transition-colors text-xs font-bold"
+                aria-label="Account"
+              >
+                <User size={16} className="text-orange-500" />
+                <span className="hidden sm:inline">
+                  {mounted && currentCustomer ? currentCustomer.name.split(' ')[0] : 'Sign In'}
+                </span>
+              </Link>
+
               {/* Cart */}
               <Link
                 href="/cart"
@@ -111,6 +125,14 @@ export default function Navbar() {
         {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden border-t bg-white px-4 py-4 space-y-3 text-sm font-medium">
+            <Link
+              href={currentCustomer ? '/account' : '/account/login'}
+              className="flex items-center gap-2 py-2.5 px-3 bg-orange-50 text-orange-700 font-bold rounded-xl mb-2"
+              onClick={() => setMenuOpen(false)}
+            >
+              <User size={16} />
+              <span>{currentCustomer ? `Account (${currentCustomer.name})` : 'Sign In / My Orders'}</span>
+            </Link>
             {[
               ['/', 'Home'],
               ['/products', 'All Products'],

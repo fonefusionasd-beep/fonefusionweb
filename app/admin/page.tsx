@@ -13,9 +13,10 @@ import { useSettingsStore, useOrderStore } from '@/lib/store';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/offers', label: 'Offers & Coupons', icon: Tag },
   { href: '/admin/banners', label: 'Offer Banners', icon: Sparkles },
   { href: '/admin/products', label: 'Products', icon: Package },
-  { href: '/admin/categories', label: 'Categories & Photos', icon: Tag },
+  { href: '/admin/categories', label: 'Categories & Photos', icon: Smartphone },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
 ];
 

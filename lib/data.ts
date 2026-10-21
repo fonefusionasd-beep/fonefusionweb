@@ -1,5 +1,5 @@
 // Mock data — replace with Supabase calls later
-import { Product, Category, Brand, HeroBanner } from '@/types';
+import { Product, Category, Brand, HeroBanner, Coupon, PincodeOffer } from '@/types';
 
 export const categories: Category[] = [
   { id: '1', name: 'Covers & Cases', icon: '📱', image: '/categories/covers.svg', slug: 'covers' },
@@ -220,4 +220,56 @@ export const defaultBanners: HeroBanner[] = [
     display_order: 3,
   },
 ];
+
+export const defaultCoupons: Coupon[] = [
+  {
+    id: 'c_1',
+    code: 'WELCOME50',
+    discount_type: 'flat',
+    discount_value: 50,
+    min_order_amount: 299,
+    is_active: true,
+    description: 'Flat ₹50 OFF on orders above ₹299 for new users',
+  },
+  {
+    id: 'c_2',
+    code: 'FONE10',
+    discount_type: 'percentage',
+    discount_value: 10,
+    min_order_amount: 499,
+    is_active: true,
+    description: '10% Extra OFF on orders above ₹499',
+  },
+  {
+    id: 'c_3',
+    code: 'FREESHIP',
+    discount_type: 'free_shipping',
+    discount_value: 49,
+    min_order_amount: 199,
+    is_active: true,
+    description: 'Free doorstep shipping on any order',
+  },
+];
+
+export const defaultPincodeOffers: PincodeOffer[] = [
+  {
+    id: 'p_1',
+    pincode: '132039',
+    city: 'Assandh (Karnal)',
+    offer_type: 'free_delivery',
+    min_order: 0,
+    is_active: true,
+    note: 'Free express local delivery for Assandh',
+  },
+  {
+    id: 'p_2',
+    pincode: '132001',
+    city: 'Karnal City',
+    offer_type: 'free_delivery',
+    min_order: 199,
+    is_active: true,
+    note: 'Free local delivery on orders above ₹199',
+  },
+];
+
 
