@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ShoppingBag, CheckCircle } from 'lucide-react';
 import { useCartStore, useSettingsStore, useOrderStore } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { formatPrice } from '@/lib/utils';
 import { Order } from '@/types';
 
@@ -51,6 +52,26 @@ export default function CheckoutPage() {
       order_status: 'pending',
       created_at: new Date().toISOString(),
     };
+
+    // Save to Supabase Cloud Database asynchronously
+    try {
+      await supabase.from('orders').insert([
+        {
+          id: newOrder.id,
+          customer_name: newOrder.customer_name,
+          customer_phone: newOrder.customer_phone,
+          customer_email: newOrder.customer_email || null,
+          customer_address: newOrder.customer_address,
+          items: newOrder.items,
+          total_amount: newOrder.total_amount,
+          payment_status: newOrder.payment_status,
+          order_status: newOrder.order_status,
+          created_at: newOrder.created_at,
+        },
+      ]);
+    } catch (dbErr) {
+      console.warn('Supabase order insert note:', dbErr);
+    }
 
     if (paymentMethod === 'payu') {
       try {

@@ -1,20 +1,57 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft, Search, Filter, ShoppingBag, Eye,
-  Phone, MapPin, Calendar, CheckCircle2, Clock, Truck, XCircle, AlertCircle
+  Phone, MapPin, Calendar, CheckCircle2, Clock, Truck, XCircle, AlertCircle, RefreshCw
 } from 'lucide-react';
 import { useOrderStore } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { formatPrice } from '@/lib/utils';
 import { Order } from '@/types';
 
 export default function AdminOrdersPage() {
-  const { orders, updateOrderStatus } = useOrderStore();
+  const { orders: storeOrders, updateOrderStatus: storeUpdateStatus } = useOrderStore();
+  const [orders, setOrders] = useState<Order[]>(storeOrders);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        setOrders(data as Order[]);
+      } else {
+        setOrders(storeOrders);
+      }
+    } catch (e) {
+      setOrders(storeOrders);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const handleUpdateStatus = async (orderId: string, status: Order['order_status']) => {
+    storeUpdateStatus(orderId, status);
+    setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, order_status: status } : o)));
+    try {
+      await supabase.from('orders').update({ order_status: status }).eq('id', orderId);
+    } catch (e) {
+      console.warn('Supabase status update error:', e);
+    }
+  };
 
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
@@ -71,6 +108,15 @@ export default function AdminOrdersPage() {
             <p className="text-sm text-gray-500">View customer orders, tracking IDs, and dispatch status</p>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={fetchOrders}
+              disabled={loading}
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors"
+              title="Refresh Orders from Cloud"
+            >
+              <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+              {loading ? 'Refreshing...' : 'Refresh'}
+            </button>
             <span className="text-xs font-semibold px-3 py-1.5 bg-orange-100 text-orange-700 rounded-xl">
               Total Orders: {orders.length}
             </span>
@@ -159,7 +205,7 @@ export default function AdminOrdersPage() {
                           {getStatusBadge(order.order_status)}
                           <select
                             value={order.order_status}
-                            onChange={(e) => updateOrderStatus(order.id, e.target.value as any)}
+                            onChange={(e) => handleUpdateStatus(order.id, e.target.value as any)}
                             className="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:border-orange-500"
                           >
                             <option value="pending">Pending</option>
