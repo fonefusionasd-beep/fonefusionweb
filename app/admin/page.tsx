@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   LayoutDashboard, Package, ShoppingBag, Tag, Smartphone,
   TrendingUp, Clock, CheckCircle, AlertCircle, LogOut, Menu, X,
-  MessageCircle, Settings, Eye, EyeOff, CreditCard, Save, CheckCheck
+  MessageCircle, Settings, Eye, EyeOff, CreditCard, Save, CheckCheck, Sparkles, Sliders
 } from 'lucide-react';
 import { products, categories } from '@/lib/data';
 import { formatPrice } from '@/lib/utils';
@@ -13,6 +13,7 @@ import { useSettingsStore, useOrderStore } from '@/lib/store';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/banners', label: 'Offer Banners', icon: Sparkles },
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/categories', label: 'Categories & Photos', icon: Tag },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
@@ -134,23 +135,32 @@ export default function AdminDashboard() {
           </div>
 
           {/* Quick actions */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Link href="/admin/banners" className="bg-gradient-to-br from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-2xl p-5 flex items-center gap-4 transition-all shadow-sm hover:shadow-md">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Sparkles size={20} />
+              </div>
+              <div>
+                <p className="font-bold">Top Offer Banners</p>
+                <p className="text-amber-100 text-xs mt-0.5">Auto-slider &amp; promo images</p>
+              </div>
+            </Link>
             <Link href="/admin/products" className="bg-orange-500 hover:bg-orange-600 text-white rounded-2xl p-5 flex items-center gap-4 transition-colors">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Package size={20} />
               </div>
               <div>
                 <p className="font-bold">Manage Products</p>
-                <p className="text-orange-100 text-sm">Add, edit, delete</p>
+                <p className="text-orange-100 text-xs mt-0.5">Add, edit, delete</p>
               </div>
             </Link>
             <Link href="/admin/orders" className="bg-gray-900 hover:bg-gray-800 text-white rounded-2xl p-5 flex items-center gap-4 transition-colors">
-              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
                 <ShoppingBag size={20} />
               </div>
               <div>
                 <p className="font-bold">View Orders</p>
-                <p className="text-gray-400 text-sm">{pendingCount} pending</p>
+                <p className="text-gray-400 text-xs mt-0.5">{pendingCount} pending orders</p>
               </div>
             </Link>
           </div>

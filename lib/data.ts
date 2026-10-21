@@ -1,5 +1,5 @@
 // Mock data — replace with Supabase calls later
-import { Product, Category, Brand } from '@/types';
+import { Product, Category, Brand, HeroBanner } from '@/types';
 
 export const categories: Category[] = [
   { id: '1', name: 'Covers & Cases', icon: '📱', image: '/categories/covers.svg', slug: 'covers' },
@@ -181,3 +181,43 @@ export const getProductsByCategory = (categoryId: string) =>
   products.filter((p) => p.category_id === categoryId);
 export const getCategoryById = (id: string) => categories.find((c) => c.id === id);
 export const getBrandById = (id: string) => brands.find((b) => b.id === id);
+
+export const defaultBanners: HeroBanner[] = [
+  {
+    id: 'banner_1',
+    title: 'Precision Fit. Ultimate Defense.',
+    subtitle: 'Military-grade drop protection covers for iPhone, Samsung, OnePlus & Vivo. Precision molding & luxury finish.',
+    badge: '🔥 NEXT-GEN MOBILE GEAR',
+    image_url: '/categories/covers.svg',
+    link_url: '/products',
+    button_text: 'Explore Collection',
+    bg_gradient: 'from-gray-950 via-gray-900 to-black',
+    is_active: true,
+    display_order: 1,
+  },
+  {
+    id: 'banner_2',
+    title: 'Special Offer: Flat 40% Off On Covers!',
+    subtitle: 'Buy any shockproof liquid silicone case and get free doorstep delivery anywhere in India.',
+    badge: '⚡ LIMITED TIME DEAL',
+    image_url: '/categories/covers.svg',
+    link_url: '/products?category=covers',
+    button_text: 'Grab Case Deals',
+    bg_gradient: 'from-orange-950 via-neutral-900 to-black',
+    is_active: true,
+    display_order: 2,
+  },
+  {
+    id: 'banner_3',
+    title: '65W GaN Fast Chargers & Heavy Duty Cables',
+    subtitle: 'Fast charging in 30 minutes with zero heating. 100% universal compatibility across all Android & iOS devices.',
+    badge: '🚀 SUPERFAST CHARGING',
+    image_url: '/categories/chargers.svg',
+    link_url: '/products?category=chargers',
+    button_text: 'Shop Chargers',
+    bg_gradient: 'from-slate-950 via-blue-950 to-black',
+    is_active: true,
+    display_order: 3,
+  },
+];
+

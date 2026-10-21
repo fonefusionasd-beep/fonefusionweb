@@ -63,3 +63,17 @@ export interface AdminUser {
   id: string;
   email: string;
 }
+
+export interface HeroBanner {
+  id: string;
+  title: string;
+  subtitle: string;
+  badge?: string;
+  image_url: string;
+  link_url: string;
+  button_text?: string;
+  bg_gradient?: string;
+  is_active: boolean;
+  display_order: number;
+}
+
