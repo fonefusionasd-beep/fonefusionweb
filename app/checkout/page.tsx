@@ -14,7 +14,7 @@ export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCartStore();
   const { codEnabled, payuEnabled, payuEnv, payuKey } = useSettingsStore();
   const { addOrder } = useOrderStore();
-  const { currentCustomer, registerOrUpdate } = useCustomerStore();
+  const { currentCustomer, registerOrUpdateCheckout } = useCustomerStore();
   const { checkPincode, validateCoupon, fetchOffers } = useOffersStore();
 
   const [form, setForm] = useState({
@@ -110,10 +110,10 @@ export default function CheckoutPage() {
     // Save/Update Customer Account if requested or already logged in
     if (createAccount || currentCustomer) {
       try {
-        await registerOrUpdate({
+        await registerOrUpdateCheckout({
           name: form.name.trim(),
           phone: form.phone.trim(),
-          email: form.email.trim() || undefined,
+          email: form.email.trim(),
           address: form.address.trim(),
           city: form.city.trim(),
           pincode: form.pincode.trim(),
@@ -351,26 +351,28 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number (10-digits) *</label>
                 <input
                   name="phone"
                   type="tel"
-                  placeholder="+91 98765 43210"
+                  maxLength={10}
+                  placeholder="10-digit Indian Mobile Number"
                   value={form.phone}
-                  onChange={handleChange}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/[^0-9]/g, '') })}
                   required
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email Address (For Invoices) *</label>
                 <input
                   name="email"
                   type="email"
                   placeholder="you@example.com"
                   value={form.email}
                   onChange={handleChange}
+                  required
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
                 />
               </div>
