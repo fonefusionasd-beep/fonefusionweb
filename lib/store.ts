@@ -162,7 +162,7 @@ const initialOrders: Order[] = [
     id: 'FF-849203',
     customer_name: 'Amit Patel',
     customer_phone: '+91 95419 74000',
-    customer_address: 'Shop No. 5, Main Market, Rohtak, Haryana',
+    customer_address: 'Nanak Pura Chowk, JC College Road, Assandh, Karnal - 132039',
     customer_email: 'amit.patel@gmail.com',
     items: [
       {

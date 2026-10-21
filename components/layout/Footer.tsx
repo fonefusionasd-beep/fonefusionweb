@@ -49,7 +49,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
                 <MapPin size={14} className="text-orange-400 mt-0.5 flex-shrink-0" />
-                <span>Shop No. 12, Main Market,<br />Your City, State 000000</span>
+                <span>Nanak Pura Chowk, JC College Road,<br />Assandh, Karnal - 132039</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone size={14} className="text-orange-400 flex-shrink-0" />
