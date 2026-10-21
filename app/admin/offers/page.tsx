@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Coupon, PincodeOffer, Order } from '@/types';
 import { useOffersStore } from '@/lib/offersStore';
+import { useCustomerStore } from '@/lib/customerStore';
 import { supabase } from '@/lib/supabase';
 import { formatPrice } from '@/lib/utils';
 
@@ -17,6 +18,7 @@ export default function AdminOffersPage() {
     pincodeOffers, addPincodeOffer, updatePincodeOffer, deletePincodeOffer,
     fetchOffers
   } = useOffersStore();
+  const { adminUpdateCustomer } = useCustomerStore();
 
   const [activeTab, setActiveTab] = useState<'coupons' | 'pincodes' | 'customers'>('coupons');
   const [successMsg, setSuccessMsg] = useState('');
@@ -27,6 +29,14 @@ export default function AdminOffersPage() {
 
   const [showPincodeModal, setShowPincodeModal] = useState(false);
   const [editingPincode, setEditingPincode] = useState<PincodeOffer | null>(null);
+
+  // Edit Customer Modal State (Admin Fix wrong number / email)
+  const [showCustomerModal, setShowCustomerModal] = useState(false);
+  const [selectedCustPhone, setSelectedCustPhone] = useState('');
+  const [custName, setCustName] = useState('');
+  const [custPhone, setCustPhone] = useState('');
+  const [custEmail, setCustEmail] = useState('');
+  const [custAddress, setCustAddress] = useState('');
 
   // Coupon Form State
   const [code, setCode] = useState('');
@@ -227,6 +237,34 @@ export default function AdminOffersPage() {
     }
     setShowPincodeModal(false);
     setTimeout(() => setSuccessMsg(''), 3000);
+  };
+
+  const openEditCustomer = (cust: { phone: string; name: string; email?: string; address?: string }) => {
+    setSelectedCustPhone(cust.phone);
+    setCustName(cust.name || '');
+    setCustPhone(cust.phone || '');
+    setCustEmail(cust.email || '');
+    setCustAddress(cust.address || '');
+    setShowCustomerModal(true);
+  };
+
+  const handleCustomerSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!custPhone.trim()) return;
+
+    const res = await adminUpdateCustomer(selectedCustPhone, {
+      name: custName.trim(),
+      phone: custPhone.trim(),
+      email: custEmail.trim().toLowerCase(),
+      address: custAddress.trim(),
+    });
+
+    if (res.success) {
+      setSuccessMsg('Customer details updated and synced with previous orders!');
+      setShowCustomerModal(false);
+      loadOrdersForCRM();
+      setTimeout(() => setSuccessMsg(''), 3500);
+    }
   };
 
   return (
@@ -534,6 +572,15 @@ export default function AdminOffersPage() {
                             <MessageCircle size={14} />
                             <span>Send Offer</span>
                           </a>
+
+                          <button
+                            onClick={() => openEditCustomer(cust)}
+                            className="inline-flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-xl text-xs transition-colors"
+                            title="Correct or edit customer phone, email, or name"
+                          >
+                            <Edit2 size={13} />
+                            <span>Edit</span>
+                          </button>
                         </div>
                       </div>
                     );
@@ -740,6 +787,91 @@ export default function AdminOffersPage() {
                   className="px-5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-sm"
                 >
                   {editingPincode ? 'Save Changes' : 'Add Pincode Rule'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: EDIT CUSTOMER DETAILS (ADMIN OVERRIDE) ── */}
+      {showCustomerModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b mb-6">
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">Edit Customer Details</h3>
+                <p className="text-xs text-gray-500">Correct typo in phone number, email address, or name</p>
+              </div>
+              <button onClick={() => setShowCustomerModal(false)} className="text-gray-400 hover:text-gray-700">✕</button>
+            </div>
+
+            <form onSubmit={handleCustomerSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Customer Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={custName}
+                  onChange={(e) => setCustName(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  Mobile Number (Correct Typo / Wrong Number) *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  maxLength={10}
+                  value={custPhone}
+                  onChange={(e) => setCustPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                  placeholder="10-digit mobile"
+                  className="w-full px-3.5 py-2.5 rounded-xl border font-mono text-sm focus:outline-none focus:border-orange-500"
+                />
+                <span className="text-[11px] text-gray-400">Updating this will automatically sync all previous orders for this customer</span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={custEmail}
+                  onChange={(e) => setCustEmail(e.target.value)}
+                  placeholder="you@gmail.com"
+                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Delivery Address</label>
+                <textarea
+                  rows={2}
+                  value={custAddress}
+                  onChange={(e) => setCustAddress(e.target.value)}
+                  placeholder="House/Street address..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowCustomerModal(false)}
+                  className="px-4 py-2 rounded-xl border text-xs font-bold text-gray-700 hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-sm"
+                >
+                  Save Changes &amp; Sync Orders
                 </button>
               </div>
             </form>

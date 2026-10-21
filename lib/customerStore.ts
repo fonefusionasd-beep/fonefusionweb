@@ -29,7 +29,8 @@ interface CustomerStore {
   }) => Promise<CustomerUser>;
   sendPasswordResetEmail: (email: string) => Promise<{ success: boolean; message: string }>;
   updatePasswordByEmail: (email: string, newPassword: string) => Promise<{ success: boolean; message: string }>;
-  updateProfile: (data: Partial<CustomerUser>) => void;
+  updateProfile: (data: Partial<CustomerUser>) => Promise<void>;
+  adminUpdateCustomer: (oldPhone: string, data: Partial<CustomerUser>) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   syncFromCloud: () => Promise<void>;
 }
@@ -306,12 +307,83 @@ export const useCustomerStore = create<CustomerStore>()(
         };
       },
 
-      updateProfile: (data) => {
+      updateProfile: async (data) => {
         const cur = get().currentCustomer;
         if (!cur) return;
         const updated = { ...cur, ...data };
         const updatedList = get().savedCustomers.map((c) => (c.id === cur.id ? updated : c));
         set({ currentCustomer: updated, savedCustomers: updatedList });
+
+        try {
+          await supabase.from('site_settings').upsert({
+            key: 'customer_accounts',
+            value: updatedList,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'key' });
+        } catch (e) {
+          console.error(e);
+        }
+      },
+
+      adminUpdateCustomer: async (oldPhone: string, data: Partial<CustomerUser>) => {
+        const cleanOldPhone = oldPhone.trim().replace(/[^0-9]/g, '');
+        await get().syncFromCloud();
+
+        const updatedList = get().savedCustomers.map((c) => {
+          const uPhone = (c.phone || '').replace(/[^0-9]/g, '');
+          if (uPhone.includes(cleanOldPhone.slice(-10))) {
+            return {
+              ...c,
+              name: data.name !== undefined ? data.name : c.name,
+              phone: data.phone !== undefined ? data.phone.replace(/[^0-9]/g, '').slice(-10) : c.phone,
+              email: data.email !== undefined ? data.email.trim().toLowerCase() : c.email,
+              address: data.address !== undefined ? data.address : c.address,
+              city: data.city !== undefined ? data.city : c.city,
+              pincode: data.pincode !== undefined ? data.pincode : c.pincode,
+            };
+          }
+          return c;
+        });
+
+        // Also if current logged in customer is this one, update them
+        const cur = get().currentCustomer;
+        if (cur && cur.phone.replace(/[^0-9]/g, '').includes(cleanOldPhone.slice(-10))) {
+          const match = updatedList.find((x) => x.id === cur.id);
+          if (match) set({ currentCustomer: match });
+        }
+
+        set({ savedCustomers: updatedList });
+
+        // Sync to Supabase site_settings
+        try {
+          await supabase.from('site_settings').upsert({
+            key: 'customer_accounts',
+            value: updatedList,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'key' });
+        } catch (e) {
+          console.error(e);
+        }
+
+        // Also update any orders in Supabase associated with this phone
+        try {
+          const updatePayload: Record<string, any> = {};
+          if (data.name) updatePayload.customer_name = data.name;
+          if (data.phone) updatePayload.customer_phone = data.phone;
+          if (data.email) updatePayload.customer_email = data.email;
+          if (data.address) updatePayload.customer_address = data.address;
+
+          if (Object.keys(updatePayload).length > 0) {
+            await supabase
+              .from('orders')
+              .update(updatePayload)
+              .ilike('customer_phone', `%${cleanOldPhone.slice(-10)}%`);
+          }
+        } catch (dbErr) {
+          console.error(dbErr);
+        }
+
+        return { success: true, message: 'Customer details successfully updated!' };
       },
 
       logout: () => {

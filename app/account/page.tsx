@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   User, Package, ShoppingBag, MapPin, Phone, Mail,
-  LogOut, Clock, CheckCircle2, Truck, AlertCircle, MessageCircle, ExternalLink, ArrowRight
+  LogOut, Clock, CheckCircle2, Truck, AlertCircle, MessageCircle, ExternalLink, ArrowRight, Edit2, Check
 } from 'lucide-react';
 import { useCustomerStore } from '@/lib/customerStore';
 import { useOrderStore } from '@/lib/store';
@@ -28,6 +28,17 @@ export default function CustomerAccountPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
 
+  // Profile Edit Modal State
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileName, setProfileName] = useState('');
+  const [profilePhone, setProfilePhone] = useState('');
+  const [profileEmail, setProfileEmail] = useState('');
+  const [profileAddress, setProfileAddress] = useState('');
+  const [profileCity, setProfileCity] = useState('');
+  const [profilePincode, setProfilePincode] = useState('');
+  const [successToast, setSuccessToast] = useState('');
+  const [profileError, setProfileError] = useState('');
+
   // Address edit state
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [addrText, setAddrText] = useState('');
@@ -43,6 +54,13 @@ export default function CustomerAccountPage() {
     setAddrText(currentCustomer.address || '');
     setCityText(currentCustomer.city || '');
     setPinText(currentCustomer.pincode || '');
+
+    setProfileName(currentCustomer.name || '');
+    setProfilePhone(currentCustomer.phone || '');
+    setProfileEmail(currentCustomer.email || '');
+    setProfileAddress(currentCustomer.address || '');
+    setProfileCity(currentCustomer.city || '');
+    setProfilePincode(currentCustomer.pincode || '');
 
     // Fetch customer's orders from Supabase (by phone number)
     const fetchCustomerOrders = async () => {
@@ -78,13 +96,56 @@ export default function CustomerAccountPage() {
     fetchCustomerOrders();
   }, [currentCustomer, router, localOrders]);
 
-  const handleSaveAddress = () => {
-    updateProfile({
+  const openEditModal = () => {
+    if (!currentCustomer) return;
+    setProfileName(currentCustomer.name || '');
+    setProfilePhone(currentCustomer.phone || '');
+    setProfileEmail(currentCustomer.email || '');
+    setProfileAddress(currentCustomer.address || '');
+    setProfileCity(currentCustomer.city || '');
+    setProfilePincode(currentCustomer.pincode || '');
+    setProfileError('');
+    setShowProfileModal(true);
+  };
+
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileError('');
+
+    const cleanPhone = profilePhone.replace(/[^0-9]/g, '');
+    if (cleanPhone.length !== 10) {
+      setProfileError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    if (!profileEmail.includes('@') || !profileEmail.includes('.')) {
+      setProfileError('Please enter a valid email address.');
+      return;
+    }
+
+    await updateProfile({
+      name: profileName.trim(),
+      phone: cleanPhone,
+      email: profileEmail.trim().toLowerCase(),
+      address: profileAddress.trim(),
+      city: profileCity.trim(),
+      pincode: profilePincode.trim(),
+    });
+
+    setShowProfileModal(false);
+    setSuccessToast('Your profile details have been updated successfully!');
+    setTimeout(() => setSuccessToast(''), 3500);
+  };
+
+  const handleSaveAddress = async () => {
+    await updateProfile({
       address: addrText,
       city: cityText,
       pincode: pinText,
     });
     setIsEditingAddress(false);
+    setSuccessToast('Delivery address saved!');
+    setTimeout(() => setSuccessToast(''), 3000);
   };
 
   if (!currentCustomer) return null;
@@ -93,25 +154,44 @@ export default function CustomerAccountPage() {
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
+        {/* Success Toast */}
+        {successToast && (
+          <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold rounded-2xl flex items-center gap-2 shadow-sm animate-fade-in">
+            <Check size={18} className="text-emerald-600" />
+            <span>{successToast}</span>
+          </div>
+        )}
+
         {/* Top Header Card */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-sm mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-orange-500/20">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-orange-500/20 flex-shrink-0">
               {currentCustomer.name ? currentCustomer.name.charAt(0).toUpperCase() : 'U'}
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900">{currentCustomer.name}</h1>
                 <span className="text-xs bg-orange-100 text-orange-700 font-bold px-2 py-0.5 rounded-full">
                   Member
                 </span>
+                <button
+                  onClick={openEditModal}
+                  className="inline-flex items-center gap-1 text-xs text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 px-2.5 py-1 rounded-lg font-bold transition-colors ml-1"
+                  title="Correct or edit your mobile number, email, or name"
+                >
+                  <Edit2 size={12} /> Edit Profile
+                </button>
               </div>
-              <p className="text-xs sm:text-sm text-gray-500 flex items-center gap-1.5 mt-1">
-                <Phone size={13} className="text-orange-500" /> {currentCustomer.phone}
+              <p className="text-xs sm:text-sm text-gray-500 flex items-center gap-1.5 mt-1 flex-wrap">
+                <span className="flex items-center gap-1 font-medium text-gray-700">
+                  <Phone size={13} className="text-orange-500" /> {currentCustomer.phone}
+                </span>
                 {currentCustomer.email && (
                   <>
-                    <span className="mx-1.5 text-gray-300">•</span>
-                    <Mail size={13} className="text-orange-500" /> {currentCustomer.email}
+                    <span className="text-gray-300">•</span>
+                    <span className="flex items-center gap-1 text-gray-700">
+                      <Mail size={13} className="text-orange-500" /> {currentCustomer.email}
+                    </span>
                   </>
                 )}
               </p>
@@ -123,7 +203,7 @@ export default function CustomerAccountPage() {
               href="/products"
               className="text-xs sm:text-sm font-bold bg-orange-500 text-white px-4 py-2.5 rounded-xl hover:bg-orange-600 transition-colors shadow-sm"
             >
-              Continue Shopping
+              Shop More
             </Link>
             <button
               onClick={() => {
@@ -194,10 +274,11 @@ export default function CustomerAccountPage() {
                     />
                     <input
                       type="text"
+                      maxLength={6}
                       value={pinText}
-                      onChange={(e) => setPinText(e.target.value)}
+                      onChange={(e) => setPinText(e.target.value.replace(/[^0-9]/g, ''))}
                       placeholder="Pincode"
-                      className="w-full px-3 py-1.5 rounded-lg border text-xs focus:outline-none focus:border-orange-500"
+                      className="w-full px-3 py-1.5 rounded-lg border text-xs font-mono focus:outline-none focus:border-orange-500"
                     />
                   </div>
                 </div>
@@ -330,6 +411,121 @@ export default function CustomerAccountPage() {
         </div>
 
       </div>
+
+      {/* Edit Profile Modal */}
+      {showProfileModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b mb-5">
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">Edit Account Details</h3>
+                <p className="text-xs text-gray-500">Correct your phone number, email address, or name</p>
+              </div>
+              <button
+                onClick={() => setShowProfileModal(false)}
+                className="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:text-gray-800 flex items-center justify-center"
+              >
+                ✕
+              </button>
+            </div>
+
+            {profileError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-medium">
+                {profileError}
+              </div>
+            )}
+
+            <form onSubmit={handleProfileSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={profileName}
+                  onChange={(e) => setProfileName(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  Mobile Number (10 digits) *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  maxLength={10}
+                  value={profilePhone}
+                  onChange={(e) => setProfilePhone(e.target.value.replace(/[^0-9]/g, ''))}
+                  placeholder="10-digit mobile"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm font-mono focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={profileEmail}
+                  onChange={(e) => setProfileEmail(e.target.value)}
+                  placeholder="you@gmail.com"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              <div className="pt-2 border-t">
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1.5">
+                  Delivery Address
+                </span>
+                <input
+                  type="text"
+                  value={profileAddress}
+                  onChange={(e) => setProfileAddress(e.target.value)}
+                  placeholder="Street / House address"
+                  className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs mb-2 focus:outline-none focus:border-orange-500"
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={profileCity}
+                    onChange={(e) => setProfileCity(e.target.value)}
+                    placeholder="City"
+                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:outline-none focus:border-orange-500"
+                  />
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={profilePincode}
+                    onChange={(e) => setProfilePincode(e.target.value.replace(/[^0-9]/g, ''))}
+                    placeholder="Pincode"
+                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs font-mono focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowProfileModal(false)}
+                  className="px-4 py-2 rounded-xl border text-xs font-bold text-gray-700 hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-md shadow-orange-500/20"
+                >
+                  Save Profile Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
