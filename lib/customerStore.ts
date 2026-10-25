@@ -168,6 +168,22 @@ export const useCustomerStore = create<CustomerStore>()(
           console.error(e);
         }
 
+        // Officially Register in Supabase Auth so Password Reset Email works
+        try {
+          await supabase.auth.signUp({
+            email: cleanEmail,
+            password: data.password,
+            options: {
+              data: {
+                name: data.name.trim(),
+                phone: cleanPhone.slice(-10),
+              },
+            },
+          });
+        } catch (authErr) {
+          console.warn('Supabase auth signUp note:', authErr);
+        }
+
         return { success: true, user: newUser };
       },
 
@@ -246,22 +262,39 @@ export const useCustomerStore = create<CustomerStore>()(
           };
         }
 
-        // Trigger Supabase Auth Reset Email
-        try {
-          const redirectUrl = typeof window !== 'undefined'
-            ? `${window.location.origin}/account/reset-password?email=${encodeURIComponent(cleanEmail)}`
-            : '';
+        // If user is not yet in Supabase auth, ensure registered so Supabase can send reset mail
+        if (user.password) {
+          try {
+            await supabase.auth.signUp({
+              email: cleanEmail,
+              password: user.password,
+              options: {
+                data: { name: user.name, phone: user.phone },
+              },
+            });
+          } catch (e) {
+            // Already in auth
+          }
+        }
 
-          await supabase.auth.resetPasswordForEmail(cleanEmail, {
-            redirectTo: redirectUrl,
-          });
-        } catch (err) {
-          console.warn('Supabase auth email note:', err);
+        const redirectUrl = typeof window !== 'undefined'
+          ? `${window.location.origin}/account/reset-password`
+          : 'https://fone-fusion-six.vercel.app/account/reset-password';
+
+        const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+          redirectTo: redirectUrl,
+        });
+
+        if (error) {
+          return {
+            success: false,
+            message: error.message || 'Failed to send reset email. Please try again.',
+          };
         }
 
         return {
           success: true,
-          message: `Password reset link has been sent to ${cleanEmail}. Please check your inbox / spam folder.`,
+          message: `Password reset link has been sent to ${cleanEmail}! Please check your email inbox and spam folder.`,
         };
       },
 

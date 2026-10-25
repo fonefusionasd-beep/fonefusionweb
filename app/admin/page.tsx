@@ -10,6 +10,7 @@ import {
 import { products, categories } from '@/lib/data';
 import { formatPrice } from '@/lib/utils';
 import { useSettingsStore, useOrderStore } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -84,11 +85,16 @@ export default function AdminDashboard() {
         {/* Logout */}
         <div className="p-3 border-t border-gray-800">
           <button
-            onClick={() => {
+            onClick={async () => {
+              try {
+                await supabase.auth.signOut();
+              } catch (e) {
+                console.error(e);
+              }
               localStorage.removeItem('fone_fusion_admin_token');
               window.location.href = '/admin/login';
             }}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 text-sm w-full transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 text-sm w-full transition-colors cursor-pointer"
           >
             <LogOut size={18} /> Logout
           </button>
