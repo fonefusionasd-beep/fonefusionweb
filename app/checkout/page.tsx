@@ -155,7 +155,6 @@ export default function CheckoutPage() {
           customer_address: newOrder.customer_address,
           items: newOrder.items,
           total_amount: newOrder.total_amount,
-          payment_method: newOrder.payment_method,
           payment_status: newOrder.payment_status,
           order_status: newOrder.order_status,
           created_at: newOrder.created_at,

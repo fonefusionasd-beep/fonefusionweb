@@ -28,8 +28,27 @@ export async function POST(request: Request) {
     const cleanInfo = (productinfo?.trim() || 'Mobile Accessories').substring(0, 50);
     const cleanOrderId = orderId?.trim() || txnid;
 
-    // PayU hash formula: sha512(key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||SALT)
-    const hashString = `${merchantKey}|${txnid}|${cleanAmount}|${cleanInfo}|${cleanName}|${cleanEmail}|${cleanOrderId}|||||||||${merchantSalt}`;
+    // PayU official hash formula: sha512(key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10|SALT)
+    const hashFields = [
+      merchantKey,
+      txnid,
+      cleanAmount,
+      cleanInfo,
+      cleanName,
+      cleanEmail,
+      cleanOrderId, // udf1
+      '',           // udf2
+      '',           // udf3
+      '',           // udf4
+      '',           // udf5
+      '',           // udf6
+      '',           // udf7
+      '',           // udf8
+      '',           // udf9
+      '',           // udf10
+      merchantSalt,
+    ];
+    const hashString = hashFields.join('|');
     const hash = crypto.createHash('sha512').update(hashString).digest('hex');
 
     const origin = request.headers.get('origin') || 'https://fone-fusion-six.vercel.app';
