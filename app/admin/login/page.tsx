@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Lock, ShieldCheck, AlertCircle, ArrowLeft, ShieldAlert, Sparkles } from 'lucide-react';
+import { Lock, ShieldCheck, ArrowLeft, ShieldAlert } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 const AUTHORIZED_ADMIN_EMAIL = 'fonefusionasd@gmail.com';
@@ -15,10 +15,10 @@ function AdminLoginForm() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if redirected with an error
+    // Check if redirected with an unauthorized error
     const errParam = searchParams.get('error');
     if (errParam === 'unauthorized') {
-      setError(`Access Denied: Only ${AUTHORIZED_ADMIN_EMAIL} is authorized to access the Admin Panel. Any other account is restricted.`);
+      setError('Access Denied: Only the authorized store owner can access the Admin Panel.');
     }
 
     // Check if already logged in as authorized admin
@@ -74,10 +74,6 @@ function AdminLoginForm() {
           <p className="text-xs font-semibold tracking-wider uppercase text-gray-400 mt-1">
             Admin Security Portal
           </p>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 mt-3 bg-orange-500/10 border border-orange-500/20 rounded-full text-[11px] font-medium text-orange-400">
-            <Sparkles size={12} />
-            <span>Authorized ID: {AUTHORIZED_ADMIN_EMAIL}</span>
-          </div>
         </div>
 
         {error && (
@@ -124,7 +120,7 @@ function AdminLoginForm() {
           </button>
 
           <p className="text-[11px] text-center text-gray-500 leading-normal">
-            Clicking above will open your Google account chooser. Make sure to select <strong className="text-gray-400 font-semibold">{AUTHORIZED_ADMIN_EMAIL}</strong>.
+            Only the authorized store administrator Google account can access this panel.
           </p>
         </div>
 
@@ -136,7 +132,7 @@ function AdminLoginForm() {
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-400">
             <ShieldCheck size={16} className="text-orange-400 flex-shrink-0" />
-            <span>Strict Single-Owner Whitelist Active</span>
+            <span>Restricted Single-Administrator Whitelist</span>
           </div>
         </div>
 

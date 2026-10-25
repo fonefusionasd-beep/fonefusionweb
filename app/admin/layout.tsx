@@ -124,7 +124,7 @@ export default function AdminLayout({
           Verifying Admin Access...
         </p>
         <p className="text-xs text-gray-500 mt-1">
-          Authorized ID: {AUTHORIZED_ADMIN_EMAIL}
+          Checking security credentials...
         </p>
       </div>
     );
