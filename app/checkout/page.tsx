@@ -45,7 +45,7 @@ export default function CheckoutPage() {
     setMounted(true);
     fetchOffers();
 
-    // Auto-fill form if customer is logged in
+    // Auto-fill form if customer is logged in or from previous checkout draft
     if (currentCustomer) {
       setForm((prev) => ({
         ...prev,
@@ -56,6 +56,22 @@ export default function CheckoutPage() {
         city: currentCustomer.city || prev.city,
         pincode: currentCustomer.pincode || prev.pincode,
       }));
+    } else {
+      const savedDraft = localStorage.getItem('fone_fusion_checkout_draft');
+      if (savedDraft) {
+        try {
+          const parsed = JSON.parse(savedDraft);
+          setForm((prev) => ({
+            ...prev,
+            name: parsed.name || prev.name,
+            phone: parsed.phone || prev.phone,
+            email: parsed.email || prev.email,
+            address: parsed.address || prev.address,
+            city: parsed.city || prev.city,
+            pincode: parsed.pincode || prev.pincode,
+          }));
+        } catch (e) {}
+      }
     }
   }, [currentCustomer, fetchOffers]);
 
@@ -106,6 +122,21 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Save draft for seamless retry if payment fails (Flipkart pattern)
+    try {
+      localStorage.setItem(
+        'fone_fusion_checkout_draft',
+        JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+          address: form.address,
+          city: form.city,
+          pincode: form.pincode,
+        })
+      );
+    } catch (e) {}
 
     // Save/Update Customer Account if requested or already logged in
     if (createAccount || currentCustomer) {
@@ -199,7 +230,8 @@ export default function CheckoutPage() {
           });
 
           document.body.appendChild(payuForm);
-          clearCart();
+          // Keep cart intact in case user cancels or payment fails (Flipkart standard)
+          // Cart will only be cleared on verified success in /payment-status or COD
           payuForm.submit();
           return;
         } else {
