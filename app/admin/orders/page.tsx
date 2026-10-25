@@ -81,9 +81,26 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const handleUpdatePaymentStatus = async (orderId: string, newPaymentStatus: Order['payment_status']) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, payment_status: newPaymentStatus } : o))
+    );
+    if (selectedOrder && selectedOrder.id === orderId) {
+      setSelectedOrder((prev) => prev ? { ...prev, payment_status: newPaymentStatus } : null);
+    }
+    try {
+      await supabase.from('orders').update({ payment_status: newPaymentStatus }).eq('id', orderId);
+    } catch (err) {
+      console.warn('Supabase update payment status error:', err);
+    }
+  };
+
   const getPaymentBadge = (status: Order['payment_status']) => {
     if (status === 'paid') {
-      return <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-green-100 text-green-700">PAID</span>;
+      return <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-green-100 text-green-700">PAID ✓</span>;
+    }
+    if (status === 'failed') {
+      return <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-700">FAILED ✕</span>;
     }
     return <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700">COD / PENDING</span>;
   };
@@ -198,7 +215,23 @@ export default function AdminOrdersPage() {
                       </td>
                       <td className="py-4 px-4">
                         <div className="font-bold text-gray-900">{formatPrice(order.total_amount)}</div>
-                        <div className="mt-0.5">{getPaymentBadge(order.payment_status)}</div>
+                        <div className="mt-1 flex items-center gap-1">
+                          <select
+                            value={order.payment_status}
+                            onChange={(e) => handleUpdatePaymentStatus(order.id, e.target.value as any)}
+                            className={`text-[11px] font-bold px-1.5 py-0.5 rounded border focus:outline-none cursor-pointer ${
+                              order.payment_status === 'paid'
+                                ? 'bg-green-50 text-green-700 border-green-200'
+                                : order.payment_status === 'failed'
+                                ? 'bg-red-50 text-red-700 border-red-200'
+                                : 'bg-amber-50 text-amber-700 border-amber-200'
+                            }`}
+                          >
+                            <option value="pending">COD / Pending</option>
+                            <option value="paid">Paid ✓</option>
+                            <option value="failed">Failed ✕</option>
+                          </select>
+                        </div>
                       </td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
@@ -296,8 +329,14 @@ export default function AdminOrdersPage() {
                 </div>
 
                 <div className="border-t pt-3 flex justify-between items-center text-sm">
-                  <span className="font-bold text-gray-700">Total Amount</span>
-                  <span className="text-lg font-bold text-orange-600">{formatPrice(selectedOrder.total_amount)}</span>
+                  <div>
+                    <span className="text-xs text-gray-500 block mb-0.5">Payment Status</span>
+                    {getPaymentBadge(selectedOrder.payment_status)}
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs text-gray-500 block">Total Amount</span>
+                    <span className="text-lg font-bold text-orange-600">{formatPrice(selectedOrder.total_amount)}</span>
+                  </div>
                 </div>
               </div>
 

@@ -138,7 +138,8 @@ export default function CheckoutPage() {
         quantity: it.quantity,
       })),
       total_amount: grandTotal,
-      payment_status: paymentMethod === 'payu' ? 'paid' : 'pending',
+      payment_method: paymentMethod,
+      payment_status: 'pending',
       order_status: 'pending',
       created_at: new Date().toISOString(),
     };
@@ -154,6 +155,7 @@ export default function CheckoutPage() {
           customer_address: newOrder.customer_address,
           items: newOrder.items,
           total_amount: newOrder.total_amount,
+          payment_method: newOrder.payment_method,
           payment_status: newOrder.payment_status,
           order_status: newOrder.order_status,
           created_at: newOrder.created_at,
@@ -171,6 +173,7 @@ export default function CheckoutPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            orderId: newOrder.id,
             amount: grandTotal,
             productinfo: productTitles || 'Mobile Accessories',
             firstname: form.name,

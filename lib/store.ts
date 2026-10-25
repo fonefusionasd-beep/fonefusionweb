@@ -115,6 +115,7 @@ interface OrderStore {
   orders: Order[];
   addOrder: (order: Order) => void;
   updateOrderStatus: (orderId: string, status: Order['order_status']) => void;
+  updatePaymentStatus: (orderId: string, status: Order['payment_status']) => void;
 }
 
 const initialOrders: Order[] = [
@@ -192,6 +193,12 @@ export const useOrderStore = create<OrderStore>()(
         set((state) => ({
           orders: state.orders.map((o) =>
             o.id === orderId ? { ...o, order_status: status } : o
+          ),
+        })),
+      updatePaymentStatus: (orderId, status) =>
+        set((state) => ({
+          orders: state.orders.map((o) =>
+            o.id === orderId ? { ...o, payment_status: status } : o
           ),
         })),
     }),

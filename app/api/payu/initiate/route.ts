@@ -10,6 +10,7 @@ export async function POST(request: Request) {
       firstname,
       email,
       phone,
+      orderId,
       key,
       salt,
       env = 'test',
@@ -25,9 +26,10 @@ export async function POST(request: Request) {
     const cleanEmail = email?.trim() || 'customer@example.com';
     const cleanPhone = phone?.trim() || '9999999999';
     const cleanInfo = (productinfo?.trim() || 'Mobile Accessories').substring(0, 50);
+    const cleanOrderId = orderId?.trim() || txnid;
 
     // PayU hash formula: sha512(key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||SALT)
-    const hashString = `${merchantKey}|${txnid}|${cleanAmount}|${cleanInfo}|${cleanName}|${cleanEmail}|||||||||||${merchantSalt}`;
+    const hashString = `${merchantKey}|${txnid}|${cleanAmount}|${cleanInfo}|${cleanName}|${cleanEmail}|${cleanOrderId}|||||||||${merchantSalt}`;
     const hash = crypto.createHash('sha512').update(hashString).digest('hex');
 
     const origin = request.headers.get('origin') || 'https://fone-fusion-six.vercel.app';
@@ -44,8 +46,9 @@ export async function POST(request: Request) {
         firstname: cleanName,
         email: cleanEmail,
         phone: cleanPhone,
-        surl: `${origin}/payment-status?status=success`,
-        furl: `${origin}/payment-status?status=failure`,
+        udf1: cleanOrderId,
+        surl: `${origin}/api/payu/callback?orderId=${encodeURIComponent(cleanOrderId)}&status=success`,
+        furl: `${origin}/api/payu/callback?orderId=${encodeURIComponent(cleanOrderId)}&status=failure`,
         hash,
         service_provider: 'payu_paisa',
       },

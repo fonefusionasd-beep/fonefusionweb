@@ -46,6 +46,7 @@ export interface Order {
   items: OrderItem[];
   total_amount: number;
   payment_id?: string;
+  payment_method?: 'payu' | 'cod';
   payment_status: 'pending' | 'paid' | 'failed';
   order_status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   created_at: string;

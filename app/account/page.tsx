@@ -386,12 +386,26 @@ export default function CustomerAccountPage() {
 
                         {/* Order Footer & Total */}
                         <div className="flex items-center justify-between pt-3 border-t border-gray-100 text-xs">
-                          <span className="text-gray-500">
-                            Payment:{' '}
-                            <strong className="text-gray-700 capitalize">
-                              {order.payment_status === 'paid' ? 'Online (Paid)' : 'Cash on Delivery'}
-                            </strong>
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-gray-500">Payment:</span>
+                            {order.payment_status === 'paid' ? (
+                              <span className="inline-flex items-center gap-1 font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                                Online (Paid) ✓
+                              </span>
+                            ) : order.payment_status === 'failed' ? (
+                              <span className="inline-flex items-center gap-1 font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-md">
+                                Payment Incomplete / Failed ✕
+                              </span>
+                            ) : order.payment_method === 'cod' ? (
+                              <span className="inline-flex items-center gap-1 font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
+                                Cash on Delivery 📦
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
+                                Payment Pending ⏳
+                              </span>
+                            )}
+                          </div>
                           <div className="text-right">
                             <span className="text-gray-400 text-[11px] mr-1.5">Total:</span>
                             <span className="text-base font-extrabold text-orange-600">
