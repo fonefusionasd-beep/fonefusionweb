@@ -7,7 +7,7 @@ import { useCartStore, useSettingsStore, useOrderStore } from '@/lib/store';
 import { useCustomerStore } from '@/lib/customerStore';
 import { useOffersStore } from '@/lib/offersStore';
 import { supabase } from '@/lib/supabase';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, getWhatsAppLink } from '@/lib/utils';
 import { Order, Coupon, PincodeOffer } from '@/types';
 
 export default function CheckoutPage() {
@@ -320,7 +320,10 @@ export default function CheckoutPage() {
             </a>
 
             <a
-              href={`https://wa.me/${form.phone.replace(/[^0-9]/g, '')}?text=${customerMsg}`}
+              href={getWhatsAppLink(
+                form.phone,
+                `Hi ${form.name}! 🎉\n\nThank you for ordering with *Fone Fusion*!\nYour Order ID is *#${orderId}*.\n\n*Order Summary:*\n${orderItemsSummary}\n\n*Total Amount:* ${formatPrice(grandTotal)}\n*Status:* Confirmed (Processing for Dispatch)\n\nTrack your order anytime: https://fone-fusion-six.vercel.app/account`
+              )}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-1.5 bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2.5 px-3 rounded-xl text-xs transition-colors"

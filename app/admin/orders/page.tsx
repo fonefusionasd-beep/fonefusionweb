@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useOrderStore } from '@/lib/store';
 import { supabase } from '@/lib/supabase';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, getWhatsAppLink } from '@/lib/utils';
 import { Order } from '@/types';
 
 export default function AdminOrdersPage() {
@@ -107,7 +107,7 @@ export default function AdminOrdersPage() {
 
   const generateWhatsAppMessage = (order: Order) => {
     const text = `Hi ${order.customer_name}! Your Fone Fusion Order #${order.id} update: Status is currently "${order.order_status.toUpperCase()}". Total: ${formatPrice(order.total_amount)}. Thanks for shopping with us!`;
-    return `https://wa.me/${order.customer_phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
+    return getWhatsAppLink(order.customer_phone, text);
   };
 
   return (

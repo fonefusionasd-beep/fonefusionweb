@@ -10,7 +10,7 @@ import { Coupon, PincodeOffer, Order } from '@/types';
 import { useOffersStore } from '@/lib/offersStore';
 import { useCustomerStore } from '@/lib/customerStore';
 import { supabase } from '@/lib/supabase';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, getWhatsAppLink } from '@/lib/utils';
 
 export default function AdminOffersPage() {
   const {
@@ -563,7 +563,10 @@ export default function AdminOffersPage() {
                           </div>
 
                           <a
-                            href={`https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}?text=${waText}`}
+                            href={getWhatsAppLink(
+                              cust.phone,
+                              `Hello ${cust.name}! 🌟 Thank you for being a valued customer at Fone Fusion. As a special gift, here is an exclusive 15% OFF coupon for your next order: *VIP15*\n\nOrder here: https://fone-fusion-six.vercel.app`
+                            )}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-colors shadow-sm"
